@@ -11,3 +11,4 @@ NEXT/TODO
 - figure out how gonna manage submissions
   - with ability to edit?
 - prevent unauthorised access
+  - https://www.authgear.com/post/add-authentication-to-any-web-page-in-10-minutes ?
