@@ -1,6 +1,7 @@
 NEXT/TODO
 -
 - integers only
+- only show how did you hear if first visit
 - validation: children (£1), some +ve visitors
 - calculate price? pop-up on submit with option to add gift aid/adjust
 - clear form/start again
