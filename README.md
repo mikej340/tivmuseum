@@ -5,7 +5,6 @@ NEXT/TODO
 - validation: children (£1), some +ve visitors
 - calculate price? pop-up on submit with option to add gift aid/adjust
 - clear form/start again
-- put actual select options in
 - zoom controls
 - notes? e.g upgrade to membership
 - maybe a visual indicator of adults and children; little human icons

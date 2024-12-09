@@ -153,26 +153,36 @@
                 <label for="hear-about-us">How did you hear about us?</label><br>
                 <select id="hear-about-us" name="hear-about-us" disabled required>
                     <option value="" disabled selected></option>
+                    <option value="newspaper-magazine">Newspaper/Magazine</option>
+                    <option value="event-exhibit-poster">Event/Exhibit poster</option>
+                    <option value="advertising-display">Advertising Display - Leisure Centre/St. Peter's Church</option>
+                    <option value="leaflet">Leaflet</option>
+                    <option value="signs-in-town">Signs in the town</option>
+                    <option value="word-of-mouth">Word of mouth</option>
+                    <option value="website">Website</option>
+                    <option value="previous-knowledge">Previous Knowledge</option>
                     <option value="social-media">Social Media</option>
-                    <option value="friend-family">Friend/Family</option>
-                    <option value="advertisement">Advertisement</option>
-                    <option value="other">Other</option>
-                </select>
+                    <option value="other">Other - please specify</option>
+                </select><br>
+                <input type="text" id="other-hear-about-us" name="other-hear-about-us" style="display: none;" placeholder="Please specify" required>
             </div>
             <div style="grid-column: 5;">
                 <label for="reason-for-visit">Reason for Visit</label><br>
                 <select id="reason-for-visit" name="reason-for-visit">
-                    <option value="tourism">Tourism</option>
-                    <option value="education">Education</option>
-                    <option value="research">Research</option>
-                    <option value="event">Event</option>
-                    <option value="other">Other</option>
+                    <option value="temporary-exhibition">Temporary Exhibition</option>
+                    <option value="craft-activities">Craft Activities</option>
+                    <option value="special-event-exhibition">Special Event/Exhibition</option>
+                    <option value="tivvy-bumper-rail-enthusiast">Tivvy Bumper/Rail Enthusiast</option>
+                    <option value="using-tourist-information-service">Using Tourist Information Service</option>
+                    <option value="just-visiting" selected>Just visiting</option>
+                    <option value="research-visit">Research Visit</option>
+                    <option value="tivvy-bumper-trail">Tivvy Bumper Trail</option>
                 </select>
             </div>
             <div>
                 <label for="visit-type">Pre-Booked</label><br>
                 <select id="visit-type" name="visit-type">
-                    <option value="walk-in">No</option>
+                    <option value="walk-in" selected>No</option>
                     <option value="pre-booked">Yes</option>
                 </select>
             </div>
@@ -228,6 +238,16 @@
                 $('#hear-about-us').prop('disabled', false);
             } else {
                 $('#hear-about-us').prop('disabled', true);
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        $('#hear-about-us').change(function() {
+            if ($(this).val() === 'other') {
+                $('#other-hear-about-us').show();
+            } else {
+                $('#other-hear-about-us').hide();
             }
         });
     });
