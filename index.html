@@ -1,1 +1,196 @@
-<h1>Hello!</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple HTML Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        form {
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .no input[type="number"] {
+            width: 3ch;
+            text-align: center;
+            font-size: xx-large;
+            border: none;
+            background-color: transparent;
+            padding: 0px;
+        }
+        input[type='number']::-webkit-inner-spin-button, 
+        input[type='number']::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(133px, 1fr));
+            grid-auto-rows: minmax(70px, auto);
+            gap: 1rem;
+        }
+        .no {
+            text-align: center;
+        }
+        .grid-container input, 
+        .grid-container select{
+            width: 100%;
+        }
+        input, select, button[type="submit"] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.5em;
+            font-size: x-large;
+        }
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        .plus-minus {
+            width: 2ch;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: xx-large;
+        }
+        .no input[type="number"].non-zero {
+            background-color: lightgreen;
+        }
+        .muted {
+            opacity: 0.5;
+        }
+        .form-footer {
+            margin-top: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <form action="/submit" method="post">
+        <div class="grid-container">
+            <div class="no">
+                <label for="adults">Adults</label><br>
+                <input type="number" id="adults" name="adults" min="0" value="0">
+            </div>
+            <div class="no">
+                <label for="members">Members</label><br>
+                <input type="number" id="members" name="members" min="0" value="0">
+            </div>
+            <div class="no">
+                <label for="carers">Carers</label><br>
+                <input type="number" id="carers" name="carers" min="0" value="0">
+            </div>
+            <div class="no">
+                <label for="blue-light">Blue Light</label><br>
+                <input type="number" id="blue-light" name="blue-light" min="0" value="0">
+            </div>
+            <div class="no">
+                <label for="half-price-voucher">Half Price Voucher</label><br>
+                <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0">
+            </div>
+            <div class="no">
+                <label for="full-price-voucher">Full Price Voucher</label><br>
+                <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0">
+            </div>
+            <div style="grid-column: 1" class="no">
+                <label for="children">Children</label><br>
+                <input type="number" id="children" name="children" min="0" value="0">
+            </div>
+            <div class="no">
+                <label for="dogs">Dogs</label><br>
+                <input type="number" id="dogs" name="dogs" min="0" value="0">
+            </div>
+            <div style="grid-column: 1;">
+                <label for="postcode">Postcode/Country</label><br>
+                <input type="text" id="postcode" name="postcode" required>
+            </div>
+            <div style="grid-column: 1;">
+                <label for="first-visit">First Visit?</label><br>
+                <select id="first-visit" name="first-visit" required>
+                    <option value="" disabled selected>&nbsp;</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div style="grid-column: span 2;">
+                <label for="hear-about-us">How did you hear about us?</label><br>
+                <select id="hear-about-us" name="hear-about-us">
+                    <option value="" disabled selected></option>
+                    <option value="social-media">Social Media</option>
+                    <option value="friend-family">Friend/Family</option>
+                    <option value="advertisement">Advertisement</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div style="grid-column: 5;" class="muted">
+                <label for="reason-for-visit">Reason for Visit</label><br>
+                <select id="reason-for-visit" name="reason-for-visit">
+                    <option value="tourism">Tourism</option>
+                    <option value="education">Education</option>
+                    <option value="research">Research</option>
+                    <option value="event">Event</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="muted">
+                <label for="visit-type">Pre-Booked</label><br>
+                <select id="visit-type" name="visit-type">
+                    <option value="walk-in">No</option>
+                    <option value="pre-booked">Yes</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-footer">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+</body>
+</html>
+<script>
+    $(document).ready(function() {
+        const numberInputs = $('input[type="number"]');
+
+        numberInputs.each(function() {
+            const numberInput = $(this);
+            const minusButton = $('<button type="button" class="plus-minus">-</button>');
+            const plusButton = $('<button type="button" class="plus-minus">+</button>');
+
+            numberInput.before(minusButton);
+            numberInput.after(plusButton);
+
+            minusButton.click(function() {
+                numberInput[0].stepDown();
+                numberInput.trigger('input');
+            });
+
+            plusButton.click(function() {
+                numberInput[0].stepUp();
+                numberInput.trigger('input');
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        $('input[type="number"]').each(function() {
+            if ($(this).val() > 0) {
+                $(this).addClass('non-zero');
+            }
+            $(this).on('input', function() {
+                if ($(this).val() > 0) {
+                    $(this).addClass('non-zero');
+                } else {
+                    $(this).removeClass('non-zero');
+                }
+            });
+        });
+    });
+</script>
