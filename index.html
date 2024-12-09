@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple HTML Form</title>
+    <title>Visitor Ledger</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        textarea:-webkit-autofill,
+        textarea:-webkit-autofill:hover,
+        textarea:-webkit-autofill:focus,
+        select:-webkit-autofill,
+        select:-webkit-autofill:hover,
+        select:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -13,6 +25,11 @@
             padding: 0;
             height: 100vh;
         }
+
+        .filled {
+            background-color: lightgreen;
+        }
+
         form {
             padding: 2rem;
             border-radius: 8px;
@@ -22,9 +39,10 @@
             width: 3ch;
             text-align: center;
             font-size: xx-large;
-            border: none;
+            border-color: transparent;
             background-color: transparent;
-            padding: 0px;
+            border-radius: 0px;
+            padding: 1px;
         }
         input[type='number']::-webkit-inner-spin-button, 
         input[type='number']::-webkit-outer-spin-button { 
@@ -62,8 +80,15 @@
             border-radius: 4px;
             font-size: xx-large;
         }
+        .plus-minus.minus {
+            border-radius: 4px 0 0 4px; 
+        }
+        .plus-minus.plus {
+            border-radius: 0 4px 4px 0;
+        }
         .no input[type="number"].non-zero {
-            background-color: lightgreen;
+            background-color: black;
+            color: white;
         }
         .muted {
             opacity: 0.5;
@@ -111,7 +136,7 @@
             </div>
             <div style="grid-column: 1;">
                 <label for="postcode">Postcode/Country</label><br>
-                <input type="text" id="postcode" name="postcode" required>
+                <input type="text" id="postcode" name="postcode" required style="text-transform: uppercase;">
             </div>
             <div style="grid-column: 1;">
                 <label for="first-visit">First Visit?</label><br>
@@ -161,8 +186,8 @@
 
         numberInputs.each(function() {
             const numberInput = $(this);
-            const minusButton = $('<button type="button" class="plus-minus">-</button>');
-            const plusButton = $('<button type="button" class="plus-minus">+</button>');
+            const minusButton = $('<button type="button" class="plus-minus minus">-</button>');
+            const plusButton = $('<button type="button" class="plus-minus plus">+</button>');
 
             numberInput.before(minusButton);
             numberInput.after(plusButton);
@@ -192,5 +217,20 @@
                 }
             });
         });
+    });
+
+    $(document).ready(function() {
+        function checkInput() {
+            if ($(this).val()) {
+                $(this).addClass('filled');
+            } else {
+                $(this).removeClass('filled');
+            }
+        }
+
+        $('input, textarea, select').on('input', checkInput);
+
+        // Trigger the input event on page load
+        $('input, textarea, select').each(checkInput);
     });
 </script>
