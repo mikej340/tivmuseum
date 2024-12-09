@@ -72,6 +72,12 @@
             padding: 0.5em;
             font-size: x-large;
         }
+        select[disabled] {
+            background-color: #f4f4f4;
+        }
+        label:has(~ select[disabled]) {
+            color: lightgray;
+        }
         button[type="submit"] {
             background-color: #007bff;
             color: #ffffff;
@@ -101,35 +107,35 @@
         <div class="grid-container">
             <div class="no">
                 <label for="adults">Adults (Full Price)</label><br>
-                <input type="number" id="adults" name="adults" min="0" value="0">
+                <input type="number" id="adults" name="adults" min="0" value="0" step="1">
             </div>
             <div class="no">
                 <label for="members">Members</label><br>
-                <input type="number" id="members" name="members" min="0" value="0">
+                <input type="number" id="members" name="members" min="0" value="0" step="1">
             </div>
             <div class="no">
                 <label for="carers">Carers</label><br>
-                <input type="number" id="carers" name="carers" min="0" value="0">
+                <input type="number" id="carers" name="carers" min="0" value="0" step="1">
             </div>
             <div class="no">
                 <label for="blue-light">Blue Light</label><br>
-                <input type="number" id="blue-light" name="blue-light" min="0" value="0">
+                <input type="number" id="blue-light" name="blue-light" min="0" value="0" step="1">
             </div>
             <div class="no">
                 <label for="half-price-voucher">Half Price Voucher</label><br>
-                <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0">
+                <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0" step="1">
             </div>
             <div class="no">
                 <label for="full-price-voucher">Full Price Voucher</label><br>
-                <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0">
+                <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0" step="1">
             </div>
             <div style="grid-column: 1" class="no">
                 <label for="children">Children</label><br>
-                <input type="number" id="children" name="children" min="0" value="0">
+                <input type="number" id="children" name="children" min="0" value="0" step="1">
             </div>
             <div class="no">
                 <label for="dogs">Dogs</label><br>
-                <input type="number" id="dogs" name="dogs" min="0" value="0">
+                <input type="number" id="dogs" name="dogs" min="0" value="0" step="1">
             </div>
             <div style="grid-column: 1;">
                 <label for="postcode">Postcode/Country</label><br>
@@ -145,7 +151,7 @@
             </div>
             <div style="grid-column: span 2;">
                 <label for="hear-about-us">How did you hear about us?</label><br>
-                <select id="hear-about-us" name="hear-about-us">
+                <select id="hear-about-us" name="hear-about-us" disabled required>
                     <option value="" disabled selected></option>
                     <option value="social-media">Social Media</option>
                     <option value="friend-family">Friend/Family</option>
@@ -214,5 +220,15 @@
 
         // Trigger the input event on page load
         $('input, textarea, select').each(checkInput);
+    });
+
+    $(document).ready(function() {
+        $('#first-visit').change(function() {
+            if ($(this).val() === 'yes') {
+                $('#hear-about-us').prop('disabled', false);
+            } else {
+                $('#hear-about-us').prop('disabled', true);
+            }
+        });
     });
 </script>

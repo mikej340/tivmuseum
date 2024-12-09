@@ -1,14 +1,15 @@
 NEXT/TODO
 -
-- integers only
-- only show how did you hear if first visit
+- maybe hide discounted adult fiels by default (as rarely input)
+  - adults, members, children, dogs on one line, expand below to show others
 - validation: children (£1), some +ve visitors
 - calculate price? pop-up on submit with option to add gift aid/adjust
 - clear form/start again
 - put actual select options in
-- uppercase postcode
 - zoom controls
 - notes? e.g upgrade to membership
+- maybe a visual indicator of adults and children; little human icons
+- maybe dropdown with common postcodes, even poss eg. "Tiverton (EX16)"
 - figure out how gonna manage submissions
   - with ability to edit?
 - prevent unauthorised access
