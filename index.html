@@ -6,6 +6,11 @@
     <title>Visitor Ledger</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        /* 
+        This CSS rule targets input, textarea, and select elements that have been autofilled by the browser.
+        It removes the default yellow background color applied by WebKit browsers (like Chrome and Safari) 
+        to autofilled form fields by setting a white background color with a large inset box-shadow.
+        */
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
@@ -39,8 +44,7 @@
             width: 3ch;
             text-align: center;
             font-size: xx-large;
-            border-color: transparent;
-            background-color: transparent;
+            border-width: 1px 0px;
             border-radius: 0px;
             padding: 1px;
         }
@@ -86,13 +90,6 @@
         .plus-minus.plus {
             border-radius: 0 4px 4px 0;
         }
-        .no input[type="number"].non-zero {
-            background-color: black;
-            color: white;
-        }
-        .muted {
-            opacity: 0.5;
-        }
         .form-footer {
             margin-top: 1rem;
             text-align: center;
@@ -100,10 +97,10 @@
     </style>
 </head>
 <body>
-    <form action="/submit" method="post">
+    <form action="/submit" method="post" autocomplete="off">
         <div class="grid-container">
             <div class="no">
-                <label for="adults">Adults</label><br>
+                <label for="adults">Adults (Full Price)</label><br>
                 <input type="number" id="adults" name="adults" min="0" value="0">
             </div>
             <div class="no">
@@ -156,7 +153,7 @@
                     <option value="other">Other</option>
                 </select>
             </div>
-            <div style="grid-column: 5;" class="muted">
+            <div style="grid-column: 5;">
                 <label for="reason-for-visit">Reason for Visit</label><br>
                 <select id="reason-for-visit" name="reason-for-visit">
                     <option value="tourism">Tourism</option>
@@ -166,7 +163,7 @@
                     <option value="other">Other</option>
                 </select>
             </div>
-            <div class="muted">
+            <div>
                 <label for="visit-type">Pre-Booked</label><br>
                 <select id="visit-type" name="visit-type">
                     <option value="walk-in">No</option>
@@ -205,30 +202,15 @@
     });
 
     $(document).ready(function() {
-        $('input[type="number"]').each(function() {
-            if ($(this).val() > 0) {
-                $(this).addClass('non-zero');
-            }
-            $(this).on('input', function() {
-                if ($(this).val() > 0) {
-                    $(this).addClass('non-zero');
-                } else {
-                    $(this).removeClass('non-zero');
-                }
-            });
-        });
-    });
-
-    $(document).ready(function() {
         function checkInput() {
-            if ($(this).val()) {
+            if ($(this).is('input[type="number"]') && $(this).val() > 0 || !$(this).is('input[type="number"]') && $(this).val()) {
                 $(this).addClass('filled');
             } else {
                 $(this).removeClass('filled');
             }
         }
 
-        $('input, textarea, select').on('input', checkInput);
+        $('input, textarea, select').on('input change', checkInput);
 
         // Trigger the input event on page load
         $('input, textarea, select').each(checkInput);
