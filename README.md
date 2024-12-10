@@ -1,9 +1,7 @@
 NEXT/TODO
 -
-- maybe hide discounted adult fiels by default (as rarely input)
-  - adults, members, children, dogs on one line, expand below to show others
-- validation: children (£1), some +ve visitors
 - calculate price? pop-up on submit with option to add gift aid/adjust
+  - if only children, £1 each
 - clear form/start again
 - zoom controls
 - notes? e.g upgrade to membership

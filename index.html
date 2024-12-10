@@ -46,8 +46,19 @@
             text-align: center;
         }
         .grid-container input, 
+        /*
+        The `box-sizing` property is used to alter the default CSS box model used to calculate widths and heights of elements. 
+        When set to `border-box`, the `width` and `height` properties include the content, padding, and border, but not the margin. 
+        This makes it easier to size elements consistently.
+
+        The `-webkit-box-sizing` and `-moz-box-sizing` properties are vendor prefixes for older versions of WebKit (Safari, Chrome) and Mozilla (Firefox) browsers, respectively. 
+        These ensure compatibility with those browsers that may not support the standard `box-sizing` property.
+        */
         .grid-container select{
-            width: 100%;
+            width: 100%; 
+            box-sizing: border-box;
+            -webkit-box-sizing:border-box;
+            -moz-box-sizing: border-box;
         }
         input, select, button[type="submit"] {
             border: 1px solid #ccc;
@@ -90,66 +101,44 @@
         <div class="grid-container">
             <div class="no">
                 <label for="adults">Adults (Full Price)</label><br>
-                <input type="number" id="adults" name="adults" min="0" value="0" step="1">
+                <input type="number" id="adults" name="adults" min="0" value="0" step="1" class="visitor-count">
             </div>
             <div class="no">
                 <label for="members">Members</label><br>
-                <input type="number" id="members" name="members" min="0" value="0" step="1">
+                <input type="number" id="members" name="members" min="0" value="0" step="1" class="visitor-count">
             </div>
             <div class="no">
                 <label for="carers">Carers</label><br>
-                <input type="number" id="carers" name="carers" min="0" value="0" step="1">
+                <input type="number" id="carers" name="carers" min="0" value="0" step="1" class="visitor-count">
             </div>
             <div class="no">
                 <label for="blue-light">Blue Light</label><br>
-                <input type="number" id="blue-light" name="blue-light" min="0" value="0" step="1">
+                <input type="number" id="blue-light" name="blue-light" min="0" value="0" step="1" class="visitor-count">
             </div>
-            <div class="no">
-                <label for="half-price-voucher">Half Price Voucher</label><br>
-                <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0" step="1">
-            </div>
-            <div class="no">
-                <label for="full-price-voucher">Full Price Voucher</label><br>
-                <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0" step="1">
-            </div>
-            <div style="grid-column: 1" class="no">
+
+            <div style="grid-column: 1;" class="no">
                 <label for="children">Children</label><br>
-                <input type="number" id="children" name="children" min="0" value="0" step="1">
+                <input type="number" id="children" name="children" min="0" value="0" step="1" class="visitor-count">
             </div>
             <div class="no">
                 <label for="dogs">Dogs</label><br>
-                <input type="number" id="dogs" name="dogs" min="0" value="0" step="1">
+                <input type="number" id="dogs" name="dogs" min="0" value="0" step="1" class="visitor-count">
             </div>
+            <div class="no">
+                <label for="half-price-voucher">Half Price Voucher</label><br>
+                <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0" step="1" class="visitor-count">
+            </div>
+            <div class="no">
+                <label for="full-price-voucher">Full Price Voucher</label><br>
+                <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0" step="1" class="visitor-count">
+            </div>
+        </div>
+        <div class="grid-container">
             <div style="grid-column: 1;">
                 <label for="postcode">Postcode/Country</label><br>
                 <input type="text" id="postcode" name="postcode" required style="text-transform: uppercase;">
             </div>
-            <div style="grid-column: 1;">
-                <label for="first-visit">First Visit?</label><br>
-                <select id="first-visit" name="first-visit" required>
-                    <option value="" disabled selected>&nbsp;</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
-            </div>
-            <div style="grid-column: span 2;">
-                <label for="hear-about-us">How did you hear about us?</label><br>
-                <select id="hear-about-us" name="hear-about-us" disabled required>
-                    <option value="" disabled selected></option>
-                    <option value="newspaper-magazine">Newspaper/Magazine</option>
-                    <option value="event-exhibit-poster">Event/Exhibit poster</option>
-                    <option value="advertising-display">Advertising Display - Leisure Centre/St. Peter's Church</option>
-                    <option value="leaflet">Leaflet</option>
-                    <option value="signs-in-town">Signs in the town</option>
-                    <option value="word-of-mouth">Word of mouth</option>
-                    <option value="website">Website</option>
-                    <option value="previous-knowledge">Previous Knowledge</option>
-                    <option value="social-media">Social Media</option>
-                    <option value="other">Other - please specify</option>
-                </select><br>
-                <input type="text" id="other-hear-about-us" name="other-hear-about-us" style="display: none;" placeholder="Please specify" required>
-            </div>
-            <div style="grid-column: 5;">
+            <div>
                 <label for="reason-for-visit">Reason for Visit</label><br>
                 <select id="reason-for-visit" name="reason-for-visit">
                     <option value="temporary-exhibition">Temporary Exhibition</option>
@@ -168,6 +157,32 @@
                     <option value="walk-in" selected>No</option>
                     <option value="pre-booked">Yes</option>
                 </select>
+            </div>
+
+            <div style="grid-column: 1;">
+                <label for="first-visit">First Visit?</label><br>
+                <select id="first-visit" name="first-visit" required>
+                    <option value="" disabled selected>&nbsp;</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div style="grid-column: span 2;">
+                <label for="hear-about-us">How did you hear about us?</label><br>
+                <select id="hear-about-us" name="hear-about-us" disabled required>
+                    <option value="" disabled selected></option>
+                    <option value="previous-knowledge">Previous Knowledge</option>
+                    <option value="newspaper-magazine">Newspaper/Magazine</option>
+                    <option value="event-exhibit-poster">Event/Exhibit poster</option>
+                    <option value="advertising-display">Advertising Display - Leisure Centre/St. Peter's Church</option>
+                    <option value="leaflet">Leaflet</option>
+                    <option value="signs-in-town">Signs in the town</option>
+                    <option value="word-of-mouth">Word of mouth</option>
+                    <option value="website">Website</option>
+                    <option value="social-media">Social Media</option>
+                    <option value="other">Other - please specify</option>
+                </select><br>
+                <input type="text" id="other-hear-about-us" name="other-hear-about-us" style="display: none;" placeholder="Please specify" disabled required>
             </div>
         </div>
         <div class="form-footer">
@@ -228,9 +243,24 @@
     $(document).ready(function() {
         $('#hear-about-us').change(function() {
             if ($(this).val() === 'other') {
-                $('#other-hear-about-us').show();
+                $('#other-hear-about-us').show().prop('disabled', false);
             } else {
-                $('#other-hear-about-us').hide();
+                $('#other-hear-about-us').hide().prop('disabled', true);
+            }
+        });
+    });
+
+    // don't submit the form if all number inputs are 0
+    $(document).ready(function() {
+        $('form').submit(function() {
+            let sum = 0;
+            $('.visitor-count').each(function() {
+                sum += parseInt($(this).val());
+            });
+
+            if (sum === 0) {
+                alert('Please enter at least one visitor');
+                return false;
             }
         });
     });
