@@ -1,7 +1,7 @@
 NEXT/TODO
 -
-- calculate price? pop-up on submit with option to add gift aid/adjust
-  - if only children, £1 each
+- consider changing ui: choose num adults, children, dogs, then specify adult types
+- build visitor inputs from model
 - clear form/start again
 - zoom controls
 - notes? e.g upgrade to membership

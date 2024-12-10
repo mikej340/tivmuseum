@@ -184,6 +184,16 @@
                 </select><br>
                 <input type="text" id="other-hear-about-us" name="other-hear-about-us" style="display: none;" placeholder="Please specify" disabled required>
             </div>
+            <div style="grid-column: 1;">
+                <label for="gift-aid-adults">Gift Aid Adults</label><br>
+                <select id="gift-aid-adults" name="gift-aid-adults" disabled required class="filled">
+                    <option value="0" selected>0 / 0</option>
+                </select>
+            </div>
+            <div>
+                <label for="price">Price (£)</label><br>
+                <input type="number" id="price" name="price" min="0" step="0.01" value="0" readonly style="border-color: transparent; background-color: transparent;">
+            </div>
         </div>
         <div class="form-footer">
             <button type="submit">Submit</button>
@@ -193,7 +203,7 @@
 </html>
 <script>
     $(document).ready(function() {
-        const numberInputs = $('input[type="number"]');
+        const numberInputs = $('.no input[type="number"]');
 
         numberInputs.each(function() {
             const numberInput = $(this);
@@ -212,6 +222,23 @@
                 numberInput[0].stepUp();
                 numberInput.trigger('input');
             });
+        });
+    });
+
+    // when Adults (Full Price) is changed, update Gift Aid Adults
+    $(document).ready(function() {
+        $('#adults').on('input change', function() {
+            const adults = $(this).val();
+            const giftAidAdults = $('#gift-aid-adults');
+
+            giftAidAdults.empty();
+            giftAidAdults.append(`<option value="0" selected>0 / ${adults}</option>`);
+
+            for (let i = 1; i <= adults; i++) {
+                giftAidAdults.append(`<option value="${i}">${i} / ${adults}</option>`);
+            }
+
+            giftAidAdults.prop('disabled', adults === '0');
         });
     });
 
@@ -247,6 +274,89 @@
             } else {
                 $('#other-hear-about-us').hide().prop('disabled', true);
             }
+        });
+    });
+
+    // update price when any visitor numbers changed
+    $(document).ready(function() { 
+        const adultPrice = 8.50;
+        const giftAidPrice = 9.35;
+        const giftAidDiff = giftAidPrice - adultPrice;
+        const halfPriceAdult = adultPrice / 2;
+        
+        // TODO: build dom from visitorTypes rather than hardcoding, but giftAidAdults is a special case
+        const visitorTypes = {
+            adults: {
+                id: '#adults',
+                price: adultPrice,
+                isAdult: true
+            },
+            members: {
+                id: '#members',
+                price: 0,
+                isAdult: true
+            },
+            carers: {
+                id: '#carers',
+                price: 0,
+                isAdult: true
+            },
+            blueLight: {
+                id: '#blue-light',
+                price: halfPriceAdult,
+                isAdult: true
+            },
+            children: {
+                id: '#children',
+                price: 0,
+                isAdult: false
+            },
+            dogs: {
+                id: '#dogs',
+                price: 0,
+                isAdult: false
+            },
+            halfPriceVoucher: {
+                id: '#half-price-voucher',
+                price: halfPriceAdult,
+                isAdult: true
+            },
+            fullPriceVoucher: {
+                id: '#full-price-voucher',
+                price: adultPrice,
+                isAdult: true
+            },
+            giftAidAdults: {
+                id: '#gift-aid-adults',
+                price: giftAidDiff,
+                isAdult: true
+            }
+        };
+
+        $('.visitor-count, #gift-aid-adults').on('input change', function() {
+            let totalPrice = 0;
+            let totalAdults = 0;
+            let totalChildren = 0;
+
+            for (const type in visitorTypes) {
+                const count = parseInt($(visitorTypes[type].id).val()) || 0;
+                const price = visitorTypes[type].price;
+                totalPrice += count * price;
+
+                if (visitorTypes[type].isAdult) {
+                    totalAdults += count;
+                } else if (type === 'children') {
+                    totalChildren += count;
+                }
+            }
+
+            // Set child price to £1 if only children are visiting
+            if (totalChildren > 0 && totalAdults === 0) {
+                totalPrice += totalChildren * 1;
+            }
+
+            // Update the total price display
+            $('#price').val(totalPrice.toFixed(2));
         });
     });
 
