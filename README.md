@@ -1,5 +1,7 @@
 NEXT/TODO
 -
+- fix for mobile (and probably tablet)
+- dont allow submission if only dogs!
 - consider changing ui: choose num adults, children, dogs, then specify adult types
 - build visitor inputs from model
 - clear form/start again
