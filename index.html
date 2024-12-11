@@ -15,8 +15,15 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 1em;
+            padding: 3em 1em 3em 1em;
             height: 100vh;
+        }
+        .zoom-controls {
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 1000;
+            margin: 1em;
         }
         .filled {
             background-color: lightgreen;
@@ -51,6 +58,7 @@
         }
         .form-footer {
             text-align: center;
+            padding-bottom: 6em;
         }
     </style>
 </head>
@@ -176,6 +184,24 @@
 </body>
 </html>
 <script>
+    // add zoom buttons to the page
+    $(document).ready(function() {
+        const zoomButtons = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom buttons"></div>');
+        const zoomLevels = [1, 1.25, 1.5, 1.75];
+
+        zoomLevels.forEach(level => {
+            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1 ? 'active' : ''}">${level}x</button>`);
+            zoomButton.click(function() {
+                $('form').css('zoom', level);
+                zoomButtons.find('button').removeClass('active');
+                $(this).addClass('active');
+            });
+            zoomButtons.append(zoomButton);
+        });
+
+        $('body').prepend(zoomButtons);
+    });
+
     $(document).ready(function() {
         const numberInputs = $('.no input[type="number"]');
 
