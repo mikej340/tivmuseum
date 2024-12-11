@@ -6,36 +6,23 @@
     <title>Visitor Ledger</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Optional Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
+            padding: 1em;
             height: 100vh;
         }
-
         .filled {
             background-color: lightgreen;
         }
-
-        form {
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
         .no input[type="number"] {
-            width: 3ch;
             text-align: center;
-            font-size: xx-large;
-            border-width: 1px 0px;
-            border-radius: 0px;
-            padding: 1px;
         }
         input[type='number']::-webkit-inner-spin-button, 
         input[type='number']::-webkit-outer-spin-button { 
@@ -44,109 +31,90 @@
         }
         .grid-container {
             display: grid;
+            gap: 1rem;
+            margin: 1em 0;
+        }
+        .grid-container.visitor-counts {
+            grid-template-columns: repeat(auto-fit, minmax(133px, 150px));
+            grid-auto-rows: minmax(70px, auto);
+            justify-content: space-evenly;
+        }
+        .grid-container.other {
             grid-template-columns: repeat(auto-fit, minmax(133px, 1fr));
             grid-auto-rows: minmax(70px, auto);
-            gap: 1rem;
         }
         .no {
             text-align: center;
         }
-        .grid-container input, 
-        /*
-        The `box-sizing` property is used to alter the default CSS box model used to calculate widths and heights of elements. 
-        When set to `border-box`, the `width` and `height` properties include the content, padding, and border, but not the margin. 
-        This makes it easier to size elements consistently.
-
-        The `-webkit-box-sizing` and `-moz-box-sizing` properties are vendor prefixes for older versions of WebKit (Safari, Chrome) and Mozilla (Firefox) browsers, respectively. 
-        These ensure compatibility with those browsers that may not support the standard `box-sizing` property.
-        */
-        .grid-container select{
-            width: 100%; 
-            box-sizing: border-box;
-            -webkit-box-sizing:border-box;
-            -moz-box-sizing: border-box;
-        }
-        input, select, button[type="submit"] {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 0.5em;
-            font-size: x-large;
-        }
-        select[disabled] {
-            background-color: #f4f4f4;
-        }
         label:has(~ select[disabled]) {
             color: lightgray;
         }
-        button[type="submit"] {
-            background-color: #007bff;
-            color: #ffffff;
-            cursor: pointer;
-        }
-        .plus-minus {
-            width: 2ch;
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: xx-large;
-        }
-        .plus-minus.minus {
-            border-radius: 4px 0 0 4px; 
-        }
-        .plus-minus.plus {
-            border-radius: 0 4px 4px 0;
-        }
         .form-footer {
-            margin-top: 1rem;
             text-align: center;
         }
     </style>
 </head>
 <body>
     <form action="/submit" method="post" autocomplete="off">
-        <div class="grid-container">
+        <div class="grid-container visitor-counts">
             <div class="no">
-                <label for="adults">Adults (Full Price)</label><br>
-                <input type="number" id="adults" name="adults" min="0" value="0" step="1" class="visitor-count">
+                <label for="adults" class="form-label">Adults (Full Price)</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="adults" name="adults" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
             <div class="no">
-                <label for="members">Members</label><br>
-                <input type="number" id="members" name="members" min="0" value="0" step="1" class="visitor-count">
+                <label for="members" class="form-label">Members</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="members" name="members" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
             <div class="no">
-                <label for="carers">Carers</label><br>
-                <input type="number" id="carers" name="carers" min="0" value="0" step="1" class="visitor-count">
+                <label for="carers" class="form-label">Carers</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="carers" name="carers" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
             <div class="no">
-                <label for="blue-light">Blue Light</label><br>
-                <input type="number" id="blue-light" name="blue-light" min="0" value="0" step="1" class="visitor-count">
+                <label for="blue-light" class="form-label">Blue Light</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="blue-light" name="blue-light" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
 
             <div style="grid-column: 1;" class="no">
-                <label for="children">Children</label><br>
-                <input type="number" id="children" name="children" min="0" value="0" step="1" class="visitor-count">
+                <label for="children" class="form-label">Children</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="children" name="children" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
             <div class="no">
-                <label for="dogs">Dogs</label><br>
-                <input type="number" id="dogs" name="dogs" min="0" value="0" step="1" class="visitor-count">
+                <label for="dogs" class="form-label">Dogs</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="dogs" name="dogs" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
             <div class="no">
-                <label for="half-price-voucher">Half Price Voucher</label><br>
-                <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0" step="1" class="visitor-count">
+                <label for="half-price-voucher" class="form-label">Half Price Voucher</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
             <div class="no">
-                <label for="full-price-voucher">Full Price Voucher</label><br>
-                <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0" step="1" class="visitor-count">
+                <label for="full-price-voucher" class="form-label">Full Price Voucher</label>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0" step="1" class="form-control visitor-count">
+                </div>
             </div>
         </div>
-        <div class="grid-container">
+        <div class="grid-container other">
             <div style="grid-column: 1;">
-                <label for="postcode">Postcode/Country</label><br>
-                <input type="text" id="postcode" name="postcode" required style="text-transform: uppercase;">
+                <label for="postcode" class="form-label">Postcode/Country</label>
+                <input type="text" id="postcode" name="postcode" required style="text-transform: uppercase;" class="form-control form-control-lg">
             </div>
             <div>
-                <label for="reason-for-visit">Reason for Visit</label><br>
-                <select id="reason-for-visit" name="reason-for-visit">
+                <label for="reason-for-visit" class="form-label">Reason for Visit</label>
+                <select id="reason-for-visit" name="reason-for-visit" class="form-control form-control-lg">
                     <option value="temporary-exhibition">Temporary Exhibition</option>
                     <option value="craft-activities">Craft Activities</option>
                     <option value="special-event-exhibition">Special Event/Exhibition</option>
@@ -158,24 +126,24 @@
                 </select>
             </div>
             <div>
-                <label for="visit-type">Pre-Booked</label><br>
-                <select id="visit-type" name="visit-type">
+                <label for="visit-type" class="form-label">Pre-Booked</label>
+                <select id="visit-type" name="visit-type" class="form-control form-control-lg">
                     <option value="walk-in" selected>No</option>
                     <option value="pre-booked">Yes</option>
                 </select>
             </div>
 
             <div style="grid-column: 1;">
-                <label for="first-visit">First Visit?</label><br>
-                <select id="first-visit" name="first-visit" required>
+                <label for="first-visit" class="form-label">First Visit?</label>
+                <select id="first-visit" name="first-visit" class="form-control form-control-lg" required>
                     <option value="" disabled selected>&nbsp;</option>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                 </select>
             </div>
             <div style="grid-column: span 2;">
-                <label for="hear-about-us">How did you hear about us?</label><br>
-                <select id="hear-about-us" name="hear-about-us" disabled required>
+                <label for="hear-about-us" class="form-label">How did you hear about us?</label>
+                <select id="hear-about-us" name="hear-about-us" class="form-control form-control-lg" disabled required>
                     <option value="" disabled selected></option>
                     <option value="previous-knowledge">Previous Knowledge</option>
                     <option value="newspaper-magazine">Newspaper/Magazine</option>
@@ -187,22 +155,22 @@
                     <option value="website">Website</option>
                     <option value="social-media">Social Media</option>
                     <option value="other">Other - please specify</option>
-                </select><br>
-                <input type="text" id="other-hear-about-us" name="other-hear-about-us" style="display: none;" placeholder="Please specify" disabled required>
+                </select>
+                <input type="text" id="other-hear-about-us" name="other-hear-about-us" class="form-control form-control-lg" style="display: none;" placeholder="Please specify" disabled required>
             </div>
             <div style="grid-column: 1;">
-                <label for="gift-aid-adults">Gift Aid Adults</label><br>
-                <select id="gift-aid-adults" name="gift-aid-adults" disabled required class="filled">
+                <label for="gift-aid-adults" class="form-label">Gift Aid Adults</label>
+                <select id="gift-aid-adults" name="gift-aid-adults" disabled required class="form-control form-control-lg filled">
                     <option value="0" selected>0 / 0</option>
                 </select>
             </div>
             <div>
-                <label for="price">Price (£)</label><br>
-                <input type="number" id="price" name="price" min="0" step="0.01" value="0.00" readonly style="border-color: transparent; background-color: transparent;">
+                <label for="price" class="form-label">Price (£)</label>
+                <input type="number" id="price" name="price" min="0" step="0.01" value="0.00" readonly class="form-control-plaintext form-control-lg">
             </div>
         </div>
         <div class="form-footer">
-            <button type="submit">Submit</button>
+            <button type="submit" class="btn btn-lg btn-primary">Submit</button>
         </div>
     </form>
 </body>
@@ -213,8 +181,8 @@
 
         numberInputs.each(function() {
             const numberInput = $(this);
-            const minusButton = $('<button type="button" class="plus-minus minus">-</button>');
-            const plusButton = $('<button type="button" class="plus-minus plus">+</button>');
+            const minusButton = $('<button type="button" class="btn btn-outline-secondary">-</button>');
+            const plusButton = $('<button type="button" class="btn btn-outline-secondary">+</button>');
 
             numberInput.before(minusButton);
             numberInput.after(plusButton);

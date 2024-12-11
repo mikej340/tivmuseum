@@ -1,10 +1,8 @@
 NEXT/TODO
 -
-- fix for mobile (and probably tablet)
 - dont allow submission if only dogs!
 - consider changing ui: choose num adults, children, dogs, then specify adult types
 - build visitor inputs from model
-- make num inputs EVEN BIGGER
 - clear form/start again
 - zoom controls
 - notes? e.g upgrade to membership
