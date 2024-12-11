@@ -179,6 +179,7 @@
         </div>
         <div class="form-footer">
             <button type="submit" class="btn btn-lg btn-primary">Submit</button>
+            <button type="reset" class="btn btn-lg btn-secondary">Reset</button>
         </div>
     </form>
 </body>
@@ -228,8 +229,13 @@
     // when Adults (Full Price) is changed, update Gift Aid Adults
     $(document).ready(function() {
         $('#adults').on('input change', function() {
-            const adults = $(this).val();
+            const adults = parseInt($(this).val());
             const giftAidAdults = $('#gift-aid-adults');
+
+            // break early if the number of adults hasn't changed
+            if (giftAidAdults.find('option').length === adults + 1) {
+                return;
+            }
 
             giftAidAdults.empty();
             giftAidAdults.append(`<option value="0" selected>0 / ${adults}</option>`);
@@ -238,7 +244,14 @@
                 giftAidAdults.append(`<option value="${i}">${i} / ${adults}</option>`);
             }
 
-            giftAidAdults.prop('disabled', adults === '0');
+            giftAidAdults.prop('disabled', adults === 0);
+        });
+
+        // Trigger the input event on form reset (with timeout to allow the form to reset)
+        $('form').on('reset', function() {
+            setTimeout(function() {
+                $('#adults').trigger('input');
+            }, 0);
         });
     });
 
@@ -251,7 +264,15 @@
             }
         }
 
+        // Trigger on input change
         $('input, textarea, select').on('input change', checkInput);
+
+        // Trigger on form reset (with timeout to allow the form to reset)
+        $('form').on('reset', function() {
+            setTimeout(function() {
+                $('input, textarea, select').each(checkInput);
+            }, 0);
+        });
 
         // Trigger the input event on page load
         $('input, textarea, select').each(checkInput);
@@ -372,6 +393,13 @@
                 alert('Please enter at least one visitor');
                 return false;
             }
+        });
+    });
+
+    // ask for confirmation before resetting the form
+    $(document).ready(function() {
+        $('form').on('reset', function() {
+            return confirm('Are you sure you want to reset the form?');
         });
     });
 </script>

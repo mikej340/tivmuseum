@@ -3,7 +3,6 @@ NEXT/TODO
 - dont allow submission if only dogs!
 - consider changing ui: choose num adults, children, dogs, then specify adult types
 - build visitor inputs from model
-- clear form/start again
 - better zoom controls; labelled? default 1.5?
   - or just fix at 150% as that's ideal?
   - use localstorage to persist? (may not need to if never navigate)
