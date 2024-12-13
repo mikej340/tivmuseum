@@ -27,3 +27,12 @@ Shirley feedback / My observations
 - when fullscreen (eg when scroll down in chrome) 1x zoom everything fits perfectly in the viewport!
 - some lady on Saturday also uses ledger to input something on computer
   - ask Carrie
+
+Pete/James
+- 
+- minus smaller than plus (try different font)
+- tab order to avoid shirley issue of tabbing to Reason for Visit?
+- consider lower-casing
+- prevent double-tap zoom if possible
+- order of select items
+- just show gift aid number in dropdown
