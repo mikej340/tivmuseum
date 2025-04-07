@@ -425,9 +425,13 @@
                 authToken: localStorage.getItem('authToken')
             };
 
-            const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxY7s6Ls-xSfYw7MNzisI1qfn41xdIe43hmCT3BgQLeBDWuUGu8LAFQrp5hhCIeflx_uA/exec';
+            const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbwTMrntsw-DAmHMpBpsm8CWELn4V0pwXD7LRwFLgdN_/dev';
             fetch(appsScriptUrl, {
+                redirect: "follow",
                 method: 'POST',
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8",
+                },
                 body: JSON.stringify(body)
             })
             .then(async response => {
