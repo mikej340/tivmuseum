@@ -425,7 +425,8 @@
                 authToken: localStorage.getItem('authToken')
             };
 
-            fetch('https://script.google.com/macros/s/AKfycbzwWeloxlTO5HK4S9vwCFMbclrrwbj6xxypvQSIwQS1HNrgnZagiSauI2Hdp0bp23dcHw/exec', {
+            const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxY7s6Ls-xSfYw7MNzisI1qfn41xdIe43hmCT3BgQLeBDWuUGu8LAFQrp5hhCIeflx_uA/exec';
+            fetch(appsScriptUrl, {
                 method: 'POST',
                 body: JSON.stringify(body)
             })
