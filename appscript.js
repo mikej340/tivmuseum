@@ -1,6 +1,16 @@
 // Google App Script
+const authToken = 'OkfnEVNjML'; // Change secret key as needed (TODO: move to separate file and don't commit to repo)
+
+// Check off token on get
+function doGet(e) {
+  if (e.parameter.authToken !== authToken) {
+    return ContentService.createTextOutput('Unauthorized').setMimeType(ContentService.MimeType.TEXT);
+  }
+
+  return ContentService.createTextOutput('Authorized').setMimeType(ContentService.MimeType.TEXT);
+}
+
 function doPost(e) {
-  const authToken = 'OkfnEVNjML'; // Change secret key as needed (TODO: move to separate file and don't commit to repo)
   const data = JSON.parse(e.postData.contents);
 
   if (data.authToken !== authToken) {

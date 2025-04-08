@@ -185,10 +185,44 @@
 </body>
 </html>
 <script>
-    // add a token to local storage
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbwXG6cg_HJH0ZnB3S6g5gZDPiEubfZcVtNNCufzFtVdDhY4dnD6xrl0Tu9Odo_OSbZTng/exec';
+
+    // Prompt for token
+    function promptForToken(clearExisting = false) {
+        if (clearExisting) {
+            localStorage.removeItem('authToken');
+        }
+        async function validateToken() {
+            while (!localStorage.getItem('authToken')) {
+                const token = prompt('Please enter the secret token:');
+                if (token) {
+                    try {
+                        const response = await fetch(`${appsScriptUrl}?authToken=${token}`, {
+                            method: 'GET',
+                            headers: {
+                                "Content-Type": "text/plain;charset=utf-8"
+                            }
+                        });
+                        const result = await response.text();
+                        if (result === 'Unauthorized') {
+                            alert('The token is incorrect. Please try again.');
+                        } else {
+                            localStorage.setItem('authToken', token);
+                            alert('Token is correct.');
+                        }
+                    } catch {
+                        alert('An error occurred while checking the token. Please try again.');
+                    }
+                }
+            }
+        }
+
+        validateToken();
+    }
+
+    // check token on page load
     $(document).ready(function() {
-        // TODO: prompt for password and store in local storage
-        localStorage.setItem('authToken', 'OkfnEVNjML');
+        promptForToken();
     });
 
     // add zoom buttons to the page
@@ -416,22 +450,6 @@
         $('form').submit(function(event) {
             event.preventDefault();
 
-            // const formData = new FormData(this);
-            // formData.append('price', $('#price').val());
-            // formData.append('timestamp', new Date().toISOString());
-            // formData.append('authToken', localStorage.getItem('authToken'));
-            
-            // const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbwTMrntsw-DAmHMpBpsm8CWELn4V0pwXD7LRwFLgdN_/dev';
-            // const queryString = new URLSearchParams(Object.fromEntries(formData.entries())).toString();
-            // const urlWithParams = `${appsScriptUrl}?${queryString}`;
-
-            // fetch(urlWithParams, {
-            //     method: 'GET',
-            //     headers: {
-            //         "Content-Type": "text/plain;charset=utf-8",
-            //     }
-            // })
-
             const formData = new FormData(this);
             formData.append('price', $('#price').val());
             formData.append('timestamp', new Date().toISOString());
@@ -441,7 +459,6 @@
                 authToken: localStorage.getItem('authToken')
             };
 
-            const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbytPInty9cyqCa8szE5ITFmdXPAHDfIsbdfu-GOSHwSaTOblo_tonE3z5tMyA_qXarIVQ/exec';
             fetch(appsScriptUrl, {
                 method: 'POST',
                 headers: {
@@ -461,7 +478,9 @@
                         $('form').trigger('reset');
                         break;
                     case 'Unauthorized':
-                        throw new Error('Unauthorized access. The secret token is incorrect');
+                        alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
+                        promptForToken(true);
+                        break
                     default:
                         throw new Error('An error occurred while submitting the form');
                 }
