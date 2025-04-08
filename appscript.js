@@ -1,6 +1,6 @@
 // Google App Script
 function doPost(e) {
-  const authToken = 'OkfnEVNjML'; // Change secret key as needed
+  const authToken = 'OkfnEVNjML'; // Change secret key as needed (TODO: move to separate file and don't commit to repo)
   const data = JSON.parse(e.postData.contents);
 
   if (data.authToken !== authToken) {
