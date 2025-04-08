@@ -7,27 +7,21 @@ function doPost(e) {
     return ContentService.createTextOutput('Unauthorized').setMimeType(ContentService.MimeType.TEXT);
   }
 
-  const record = data.record;
-
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1'); // Change sheet name as needed
-  sheet.appendRow([
-    record['adults'],
-    record['members'],
-    record['carers'],
-    record['blue-light'],
-    record['children'],
-    record['dogs'],
-    record['half-price-voucher'],
-    record['full-price-voucher'],
-    record['postcode'],
-    record['reason-for-visit'],
-    record['visit-type'],
-    record['first-visit'],
-    record['hear-about-us'],
-    record['other-hear-about-us'],
-    record['gift-aid-adults'],
-    record['price'],
-    record['timestamp']
-  ]);
+  const headings = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  // Loop through headings and if included in record, then add to records to append to the sheet
+  const recordToAppend = {};
+  for (let i = 0; i < headings.length; i++) {
+    const heading = headings[i];
+    if (heading in data.record) {
+      recordToAppend[heading] = data.record[heading];
+    } else {
+      recordToAppend[heading] = ''; // Add empty string if heading is not in record
+    } 
+  }
+
+  sheet.appendRow(Object.values(recordToAppend));
+
   return ContentService.createTextOutput('Success').setMimeType(ContentService.MimeType.TEXT);
 }
