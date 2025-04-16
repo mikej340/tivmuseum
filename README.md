@@ -1,6 +1,5 @@
 NEXT/TODO
 -
-- readonly numeric inputs to basically prevent keyboard showing up (kb showing up is what concerns me most; staff may get confused)
 - dont allow submission if only dogs!
 - build visitor inputs from model
 - better zoom controls; labelled? default 1.5?
