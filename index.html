@@ -130,7 +130,7 @@
             <div style="grid-column: 1;">
                 <label for="gift-aid-adults" class="form-label">Gift Aid Adults</label>
                 <select id="gift-aid-adults" name="gift-aid-adults" disabled required class="form-control form-control-lg filled">
-                    <option value="0" selected>0 / 0</option>
+                    <option value=""></option>
                 </select>
             </div>
             <div>
@@ -352,15 +352,16 @@
             const giftAidAdults = $('#gift-aid-adults');
 
             // break early if the number of adults hasn't changed
-            if (giftAidAdults.find('option').length === adults + 1) {
+            if (giftAidAdults.find('option').length === adults + 2) {
                 return;
             }
 
             giftAidAdults.empty();
-            giftAidAdults.append(`<option value="0" selected>0 / ${adults}</option>`);
+giftAidAdults.append(`<option value="" disabled selected></option>`);
+            giftAidAdults.append(`<option value="0">0</option>`);
 
             for (let i = 1; i <= adults; i++) {
-                giftAidAdults.append(`<option value="${i}">${i} / ${adults}</option>`);
+                giftAidAdults.append(`<option value="${i}">${i}</option>`);
             }
 
             giftAidAdults.prop('disabled', adults === 0);
