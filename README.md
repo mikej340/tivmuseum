@@ -1,30 +1,29 @@
 NEXT/TODO
 -
+- Disable submit on click until response
 - dont allow submission if only dogs!
-- build visitor inputs from model
-- better zoom controls; labelled? default 1.5?
+- If children only, must be 13+
+- If members (and optional children, and first visit), don’t need any other info
+- Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
+  - Add Local Resident
+  - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”- better zoom controls; labelled? default 1.5?
   - or just fix at 150% as that's ideal?
   - use localstorage to persist? (may not need to if never navigate)
 - notes? e.g upgrade to membership
 - figure out how gonna manage submissions
   - with ability to edit?
 - web app would be preferable, remove confusion of browser interface
-Blue light price is 7.22, 15% Off
+- Blue light price is 7.22, 15% Off
 - can giftaid Blue light, half price, and?
-- gift aid price
-- gift aid missed, somehow ensure not missed. Don’t have 0/N by default? Instead blank? And require selection
-- Disable submit on click until response
-- If children only, must be 13+
-- If members (and optional children, and first visit), don’t need any other info
-- Letters/numbers against reason and how heard about (as whilst moving to app, some will still use spreadsheet; someone will have to enter into app at end of day, or something)
-  - Add Local Resident
-  - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”
+- gift aid price col in SS
+- UK times, not UTC
+- gift aid missed, somehow ensure not missed. Don’t have 0/N by default? Instead blank? And require selectionwill still use spreadsheet; someone will have to enter into app at end of day, or something)
 - Add worksheet showing totals per day
 - Test key incorrect, wrong fields
 - Link (from menu?) to spreadsheet
 - Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
 - Also link to GitHub/documentation?
-- UK times, not UTC
+
 - Cancel link when entering post code (next to label, on tablet only, as it’s not clear/easy to dismiss keyboard)
 
 Shirley feedback / My observations
