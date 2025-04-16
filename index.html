@@ -448,6 +448,9 @@
         $('form').submit(function(event) {
             event.preventDefault();
 
+            const submitButton = $(this).find('button[type="submit"]');
+            submitButton.prop('disabled', true).text('Processing...');
+
             const formData = new FormData(this);
             formData.append('price', $('#price').val());
             formData.append('timestamp', new Date().toISOString());
@@ -478,13 +481,16 @@
                     case 'Unauthorized':
                         alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
                         promptForToken(true);
-                        break
+                        break;
                     default:
                         throw new Error('An error occurred while submitting the form');
                 }
             })
             .catch(error => {
                 alert(error);
+            })
+            .finally(() => {
+                submitButton.prop('disabled', false).text('Submit');
             });
         });
     });
