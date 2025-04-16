@@ -208,6 +208,7 @@
     $(document).ready(function() { 
         const adultPrice = 8.50;
         const giftAidPrice = 9.35;
+        const blPrice = 7.22; // 15% discount for Blue Light
         const giftAidDiff = giftAidPrice - adultPrice;
         const halfPriceAdult = adultPrice / 2;
         
@@ -232,7 +233,7 @@
             },
             blueLight: {
                 id: 'blue-light',
-                price: halfPriceAdult,
+                price: blPrice,
                 isAdult: true,
                 label: 'Blue Light'
             },
