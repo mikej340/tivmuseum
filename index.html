@@ -63,57 +63,18 @@
     </style>
 </head>
 <body>
+    <!-- Template for visitor count inputs -->
+    <template id="visitor-count-template">
+        <div class="no">
+            <label for="" class="form-label"></label>
+            <div class="input-group input-group-lg">
+                <input type="number" id="" name="" min="0" value="0" step="1" class="form-control visitor-count">
+            </div>
+        </div>
+    </template>
+
     <form action="/submit" method="post" autocomplete="off">
         <div class="grid-container visitor-counts">
-            <div class="no">
-                <label for="adults" class="form-label">Adults (Full Price)</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="adults" name="adults" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
-            <div class="no">
-                <label for="members" class="form-label">Members</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="members" name="members" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
-            <div class="no">
-                <label for="carers" class="form-label">Carers</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="carers" name="carers" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
-            <div class="no">
-                <label for="blue-light" class="form-label">Blue Light</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="blue-light" name="blue-light" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
-
-            <div style="grid-column: 1;" class="no">
-                <label for="children" class="form-label">Children</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="children" name="children" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
-            <div class="no">
-                <label for="dogs" class="form-label">Dogs</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="dogs" name="dogs" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
-            <div class="no">
-                <label for="half-price-voucher" class="form-label">Half Price Voucher</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="half-price-voucher" name="half-price-voucher" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
-            <div class="no">
-                <label for="full-price-voucher" class="form-label">Full Price Voucher</label>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="full-price-voucher" name="full-price-voucher" min="0" value="0" step="1" class="form-control visitor-count">
-                </div>
-            </div>
         </div>
         <div class="grid-container other">
             <div style="grid-column: 1;">
@@ -243,6 +204,123 @@
         $('body').prepend(zoomButtons);
     });
 
+    // visitor number inputs
+    $(document).ready(function() { 
+        const adultPrice = 8.50;
+        const giftAidPrice = 9.35;
+        const giftAidDiff = giftAidPrice - adultPrice;
+        const halfPriceAdult = adultPrice / 2;
+        
+        const visitorTypes = {
+            adults: {
+                id: 'adults',
+                price: adultPrice,
+                isAdult: true,
+                label: 'Adults (Full Price)'
+            },
+            members: {
+                id: 'members',
+                price: 0,
+                isAdult: true,
+                label: 'Members'
+            },
+            carers: {
+                id: 'carers',
+                price: 0,
+                isAdult: true,
+                label: 'Carers'
+            },
+            blueLight: {
+                id: 'blue-light',
+                price: halfPriceAdult,
+                isAdult: true,
+                label: 'Blue Light'
+            },
+            children: {
+                id: 'children',
+                price: 0,
+                isAdult: false,
+                label: 'Children'
+            },
+            dogs: {
+                id: 'dogs',
+                price: 0,
+                isAdult: false,
+                label: 'Dogs'
+            },
+            halfPriceVoucher: {
+                id: 'half-price-voucher',
+                price: halfPriceAdult,
+                isAdult: true,
+                label: 'Half Price Voucher'
+            },
+            fullPriceVoucher: {
+                id: 'full-price-voucher',
+                price: adultPrice,
+                isAdult: true,
+                label: 'Full Price Voucher'
+            },
+            giftAidAdults: {
+                id: 'gift-aid-adults',
+                price: giftAidDiff,
+                isAdult: true,
+                isAwkward: true, // this is a special case. TODO refactor this
+                label: 'Gift Aid Adults'
+            }
+        };
+
+        // Build visitor account inputs from visitor types
+        for (const type in visitorTypes) {
+            const visitorType = visitorTypes[type];
+            if (visitorType.isAwkward) {
+                continue;
+            }
+            const template = $('#visitor-count-template').html();
+            const newElement = $(template);
+
+            // add new row to the grid for every 4th element
+            if (Object.keys(visitorTypes).indexOf(type) % 4 === 0) {
+                newElement.attr('style', 'grid-column: 1;');
+            }
+            newElement.find('label')
+                .attr('for', visitorType.id)
+                .text(visitorType.label);
+            newElement.find('input')
+                .attr('id', visitorType.id)
+                .attr('name', visitorType.id);
+
+            $('.visitor-counts').append(newElement);
+        }
+
+        // update price when any visitor numbers changed
+        $('.visitor-count, #gift-aid-adults').on('input change', function() {
+            let totalPrice = 0;
+            let totalAdults = 0;
+            let totalChildren = 0;
+
+            for (const type in visitorTypes) {
+                const count = parseInt($(visitorTypes[type].id).val()) || 0;
+                const price = visitorTypes[type].price;
+                totalPrice += count * price;
+
+                if (visitorTypes[type].isAdult) {
+                    totalAdults += count;
+                } else if (type === 'children') {
+                    totalChildren += count;
+                }
+            }
+
+            // Set child price to £1 if only children are visiting
+            if (totalChildren > 0 && totalAdults === 0) {
+                totalPrice += totalChildren * 1;
+            }
+
+            // Update the total price display
+            $('#price').val(totalPrice.toFixed(2));
+        });
+    });
+
+    // add plus and minus buttons to number inputs
     $(document).ready(function() {
         const numberInputs = $('.no input[type="number"]');
 
@@ -295,6 +373,7 @@
         });
     });
 
+    // add filled class to inputs that are filled
     $(document).ready(function() {
         function checkInput() {
             if ($(this).is('input[type="number"]') && $(this).val() > 0 || !$(this).is('input[type="number"]') && $(this).val()) {
@@ -318,6 +397,7 @@
         $('input, textarea, select').each(checkInput);
     });
 
+    // enable/disable "How did you hear about us?" based on "First Visit?"
     $(document).ready(function() {
         $('#first-visit').change(function() {
             if ($(this).val() === 'yes') {
@@ -328,6 +408,7 @@
         });
     });
 
+    // show/hide "Other" input based on "How did you hear about us?"
     $(document).ready(function() {
         $('#hear-about-us').change(function() {
             if ($(this).val() === 'other') {
@@ -335,89 +416,6 @@
             } else {
                 $('#other-hear-about-us').hide().prop('disabled', true);
             }
-        });
-    });
-
-    // update price when any visitor numbers changed
-    $(document).ready(function() { 
-        const adultPrice = 8.50;
-        const giftAidPrice = 9.35;
-        const giftAidDiff = giftAidPrice - adultPrice;
-        const halfPriceAdult = adultPrice / 2;
-        
-        // TODO: build dom from visitorTypes rather than hardcoding, but giftAidAdults is a special case
-        const visitorTypes = {
-            adults: {
-                id: '#adults',
-                price: adultPrice,
-                isAdult: true
-            },
-            members: {
-                id: '#members',
-                price: 0,
-                isAdult: true
-            },
-            carers: {
-                id: '#carers',
-                price: 0,
-                isAdult: true
-            },
-            blueLight: {
-                id: '#blue-light',
-                price: halfPriceAdult,
-                isAdult: true
-            },
-            children: {
-                id: '#children',
-                price: 0,
-                isAdult: false
-            },
-            dogs: {
-                id: '#dogs',
-                price: 0,
-                isAdult: false
-            },
-            halfPriceVoucher: {
-                id: '#half-price-voucher',
-                price: halfPriceAdult,
-                isAdult: true
-            },
-            fullPriceVoucher: {
-                id: '#full-price-voucher',
-                price: adultPrice,
-                isAdult: true
-            },
-            giftAidAdults: {
-                id: '#gift-aid-adults',
-                price: giftAidDiff,
-                isAdult: true
-            }
-        };
-
-        $('.visitor-count, #gift-aid-adults').on('input change', function() {
-            let totalPrice = 0;
-            let totalAdults = 0;
-            let totalChildren = 0;
-
-            for (const type in visitorTypes) {
-                const count = parseInt($(visitorTypes[type].id).val()) || 0;
-                const price = visitorTypes[type].price;
-                totalPrice += count * price;
-
-                if (visitorTypes[type].isAdult) {
-                    totalAdults += count;
-                } else if (type === 'children') {
-                    totalChildren += count;
-                }
-            }
-
-            // Set child price to £1 if only children are visiting
-            if (totalChildren > 0 && totalAdults === 0) {
-                totalPrice += totalChildren * 1;
-            }
-
-            // Update the total price display
-            $('#price').val(totalPrice.toFixed(2));
         });
     });
 
