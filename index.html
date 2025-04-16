@@ -357,7 +357,7 @@
             }
 
             giftAidAdults.empty();
-giftAidAdults.append(`<option value="" disabled selected></option>`);
+            giftAidAdults.append(`<option value="" disabled selected></option>`);
             giftAidAdults.append(`<option value="0">0</option>`);
 
             for (let i = 1; i <= adults; i++) {
@@ -423,7 +423,7 @@ giftAidAdults.append(`<option value="" disabled selected></option>`);
 
     // don't submit the form if all number inputs are 0
     $(document).ready(function() {
-        $('form').submit(function() {
+        $('form').submit(function(event) {
             let sum = 0;
             $('.visitor-count').each(function() {
                 sum += parseInt($(this).val());
@@ -431,7 +431,8 @@ giftAidAdults.append(`<option value="" disabled selected></option>`);
 
             if (sum === 0) {
                 alert('Please enter at least one visitor');
-                return false;
+                event.preventDefault(); // Prevent form submission
+                event.stopImmediatePropagation(); // Stop other submit listeners
             }
         });
     });
