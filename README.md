@@ -2,18 +2,13 @@ NEXT/TODO
 -
 - readonly numeric inputs to basically prevent keyboard showing up (kb showing up is what concerns me most; staff may get confused)
 - dont allow submission if only dogs!
-- consider changing ui: choose num adults, children, dogs, then specify adult types
 - build visitor inputs from model
 - better zoom controls; labelled? default 1.5?
   - or just fix at 150% as that's ideal?
   - use localstorage to persist? (may not need to if never navigate)
 - notes? e.g upgrade to membership
-- maybe a visual indicator of adults and children; little human icons
-- maybe dropdown with common postcodes, even poss eg. "Tiverton (EX16)"
 - figure out how gonna manage submissions
   - with ability to edit?
-- prevent unauthorised access
-  - https://www.authgear.com/post/add-authentication-to-any-web-page-in-10-minutes ?
 - web app would be preferable, remove confusion of browser interface
 
 Shirley feedback / My observations
@@ -27,6 +22,23 @@ Shirley feedback / My observations
 - when fullscreen (eg when scroll down in chrome) 1x zoom everything fits perfectly in the viewport!
 - some lady on Saturday also uses ledger to input something on computer
   - ask Carrie
+- gift aid price
+- gift aid missed, somehow ensure not missed. Don’t have 0/N by default? Instead blank? And require selection
+- Disable submit on click until response
+- If children only, must be 13+
+- If members (and optional children, and first visit), don’t need any other info
+- Letters/numbers against reason and how heard about (as whilst moving to app, some will still use spreadsheet; someone will have to enter into app at end of day, or something)
+  - Add Local Resident
+  - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”
+
+- Add worksheet showing totals per day
+- Test key incorrect, wrong fields
+- Link (from menu?) to spreadsheet
+- Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
+- Also link to GitHub/documentation?
+- UK times, not UTC
+- Cancel link when entering post code (next to label, on tablet only, as it’s not clear/easy to dismiss keyboard)
+
 
 Pete/James
 - 
