@@ -299,7 +299,7 @@
             let totalChildren = 0;
 
             for (const type in visitorTypes) {
-                const count = parseInt($(visitorTypes[type].id).val()) || 0;
+                const count = parseInt($(`#${visitorTypes[type].id}`).val()) || 0;
                 const price = visitorTypes[type].price;
                 totalPrice += count * price;
 
