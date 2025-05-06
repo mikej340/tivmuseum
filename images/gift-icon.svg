@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-gift" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ba68c8" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="Gift Aid">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="3" y="8" width="18" height="4" rx="1" />
+  <path d="M12 8v13" />
+  <path d="M8 12h-4v8a1 1 0 0 0 1 1h3" />
+  <path d="M16 12h4v8a1 1 0 0 1 -1 1h-3" />
+  <path d="M12 8h-4a2 2 0 1 1 4-4 2 2 0 0 1 4 4h-4" />
+</svg>
