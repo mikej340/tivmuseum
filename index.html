@@ -74,7 +74,22 @@
     </template>
 
     <form action="/submit" method="post" autocomplete="off">
-        <div class="grid-container visitor-counts">
+        <div id="defaultVisitorCounts" class="grid-container visitor-counts">
+        </div>
+        <div class="accordion" id="otherVisitorOptionsAccordian">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="otherOptionsHeading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#otherOptions" aria-expanded="false" aria-controls="otherOptions">
+                        Other Options
+                    </button>
+                </h2>
+                <div id="otherOptions" class="accordion-collapse collapse" aria-labelledby="otherOptionsHeading" data-bs-parent="#otherVisitorOptionsAccordian">
+                    <div class="accordion-body">
+                        <div id="otherVisitorCounts" class="grid-container visitor-counts">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="grid-container other">
             <div style="grid-column: 1;">
@@ -139,6 +154,7 @@
             </div>
         </div>
         <div class="form-footer">
+            <p id="members-only-message" style="display: none;">(No other fields required as only members visiting)</p>
             <button type="submit" class="btn btn-lg btn-primary">Submit</button>
             <button type="reset" class="btn btn-lg btn-secondary">Reset</button>
         </div>
@@ -205,120 +221,70 @@
     });
 
     // visitor number inputs
-    $(document).ready(function() { 
-        const adultPrice = 8.50;
-        const giftAidPrice = 9.35;
-        const blPrice = 7.22; // 15% discount for Blue Light
-        const giftAidDiff = giftAidPrice - adultPrice;
-        const halfPriceAdult = adultPrice / 2;
-        
-        const visitorTypes = {
-            adults: {
-                id: 'adults',
-                price: adultPrice,
-                isAdult: true,
-                label: 'Adults (Full Price)'
-            },
-            members: {
-                id: 'members',
-                price: 0,
-                isAdult: true,
-                label: 'Members'
-            },
-            carers: {
-                id: 'carers',
-                price: 0,
-                isAdult: true,
-                label: 'Carers'
-            },
-            blueLight: {
-                id: 'blue-light',
-                price: blPrice,
-                isAdult: true,
-                label: 'Blue Light'
-            },
-            children: {
-                id: 'children',
-                price: 0,
-                isAdult: false,
-                label: 'Children'
-            },
-            dogs: {
-                id: 'dogs',
-                price: 0,
-                isAdult: false,
-                label: 'Dogs'
-            },
-            halfPriceVoucher: {
-                id: 'half-price-voucher',
-                price: halfPriceAdult,
-                isAdult: true,
-                label: 'Half Price Voucher'
-            },
-            fullPriceVoucher: {
-                id: 'full-price-voucher',
-                price: adultPrice,
-                isAdult: true,
-                label: 'Full Price Voucher'
-            },
-            giftAidAdults: {
-                id: 'gift-aid-adults',
-                price: giftAidDiff,
-                isAdult: true,
-                isAwkward: true, // this is a special case. TODO refactor this
-                label: 'Gift Aid Adults'
-            }
-        };
+    $(document).ready(function() {
+        const visitorTypes = [
+            { id: 'adults', price: 8.50, isAdult: true, label: 'Adults (Full Price)', visibleByDefault: true },
+            { id: 'children', price: 0, isAdult: false, label: 'Children', visibleByDefault: true },
+            { id: 'members', price: 0, isAdult: true, label: 'Members', visibleByDefault: true },
+            { id: 'carers', price: 0, isAdult: true, label: 'Carers', visibleByDefault: false },
+            { id: 'blue-light', price: 7.22, isAdult: true, label: 'Blue Light', visibleByDefault: false },
+            { id: 'dogs', price: 0, isAdult: false, label: 'Dogs', visibleByDefault: true },
+            { id: 'half-price-voucher', price: 4.25, isAdult: true, label: 'Half Price Voucher', visibleByDefault: false },
+            { id: 'full-price-voucher', price: 8.50, isAdult: true, label: 'Full Price Voucher', visibleByDefault: false }
+        ];
 
-        // Build visitor account inputs from visitor types
-        for (const type in visitorTypes) {
-            const visitorType = visitorTypes[type];
-            if (visitorType.isAwkward) {
-                continue;
-            }
+        // Build visitor count inputs dynamically
+        visitorTypes.forEach(type => {
             const template = $('#visitor-count-template').html();
-            const newElement = $(template);
+            const newElement = $(template).clone(); // Ensure a fresh clone for each visitor type
 
-            // add new row to the grid for every 4th element
-            if (Object.keys(visitorTypes).indexOf(type) % 4 === 0) {
-                newElement.attr('style', 'grid-column: 1;');
+            newElement.find('label').attr('for', type.id).text(type.label);
+            newElement.find('input').attr('id', type.id).attr('name', type.id);
+
+            if (type.visibleByDefault) {
+                $('#defaultVisitorCounts').append(newElement);
+            } else {
+                $('#otherVisitorCounts').append(newElement);
             }
-            newElement.find('label')
-                .attr('for', visitorType.id)
-                .text(visitorType.label);
-            newElement.find('input')
-                .attr('id', visitorType.id)
-                .attr('name', visitorType.id);
+        });
 
-            $('.visitor-counts').append(newElement);
-        }
-
-        // update price when any visitor numbers changed
-        $('.visitor-count, #gift-aid-adults').on('input change', function() {
+        // Update price and visibility logic
+        function updatePriceAndVisibility() {
             let totalPrice = 0;
             let totalAdults = 0;
             let totalChildren = 0;
+            const totalMembers = parseInt($('#members').val()) || 0;
 
-            for (const type in visitorTypes) {
-                const count = parseInt($(`#${visitorTypes[type].id}`).val()) || 0;
-                const price = visitorTypes[type].price;
-                totalPrice += count * price;
+            visitorTypes.forEach(type => {
+                const count = parseInt($(`#${type.id}`).val()) || 0;
+                totalPrice += count * type.price;
 
-                if (visitorTypes[type].isAdult) {
+                if (type.isAdult) {
                     totalAdults += count;
-                } else if (type === 'children') {
+                } else if (type.id === 'children') {
                     totalChildren += count;
                 }
-            }
+            });
 
-            // Set child price to £1 if only children are visiting
+            // Apply special pricing for children-only visits
             if (totalChildren > 0 && totalAdults === 0) {
                 totalPrice += totalChildren * 1;
             }
 
-            // Update the total price display
             $('#price').val(totalPrice.toFixed(2));
-        });
+
+            // Toggle visibility of additional fields
+            if (totalAdults > 0 && totalMembers === totalAdults) {
+                $('.grid-container.other').hide();
+                $('#members-only-message').show();
+            } else {
+                $('.grid-container.other').show();
+                $('#members-only-message').hide();
+            }
+        }
+
+        // Attach event listeners
+        $('.visitor-count').on('input change', updatePriceAndVisibility);
     });
 
     // add plus and minus buttons to number inputs

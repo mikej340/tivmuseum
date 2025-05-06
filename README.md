@@ -1,4 +1,5 @@
 NEXT/TODO
+- Balls... Single input for gift aid adults is insufficient as other types of adult can be gift aid
 - If children only, must be 13+
 - If members (and optional children, and first visit), don’t need any other info
 - Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
@@ -14,7 +15,6 @@ NEXT/TODO
 - can giftaid Blue light, half price, and?
 - gift aid price col in SS
 - UK times, not UTC
-- gift aid missed, somehow ensure not missed. Don’t have 0/N by default? Instead blank? And require selectionwill still use spreadsheet; someone will have to enter into app at end of day, or something)
 - Add worksheet showing totals per day
 - Test key incorrect, wrong fields
 - Link (from menu?) to spreadsheet
