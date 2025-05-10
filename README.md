@@ -1,19 +1,17 @@
 NEXT/TODO
-- Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
+- (need full list) Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
   - Add Local Resident
-  - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”- better zoom controls; labelled? default 1.5?
+  - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”
+- better zoom controls; labelled? default 1.5?
   - or just fix at 150% as that's ideal?
-  - use localstorage to persist? (may not need to if never navigate)
+- use localstorage to persist? (may not need to if never navigate)
 - Cancel link when entering post code (next to label, on tablet only, as it’s not clear/easy to dismiss keyboard)
 - notes? e.g upgrade to membership
 - figure out how gonna manage submissions
   - with ability to edit?
 - web app would be preferable, remove confusion of browser interface
-- can giftaid Blue light, half price, and?
 - gift aid price col in SS
-- UK times, not UTC
 - Add worksheet showing totals per day
-- Test key incorrect, wrong fields
 - Link (from menu?) to spreadsheet
 - Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
 - Also link to GitHub/documentation?
@@ -31,15 +29,12 @@ Shirley feedback / My observations
 - keyboard popping up is likely (other than browser distractions) most troublesome aspect. therefore consider alternative to text input for postcode... somehow
 - browser. address bar, tabs, other buttons just create opportunity for users to get themselves in trouble
   - app?
-- when fullscreen (eg when scroll down in chrome) 1x zoom everything fits perfectly in the viewport!
 - some lady on Saturday also uses ledger to input something on computer
   - ask Carrie
   
 Pete/James
-- 
 - minus smaller than plus (try different font)
 - tab order to avoid shirley issue of tabbing to Reason for Visit?
 - consider lower-casing
 - prevent double-tap zoom if possible
 - order of select items
-- just show gift aid number in dropdown

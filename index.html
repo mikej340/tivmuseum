@@ -59,14 +59,6 @@
             text-align: center;
             padding-bottom: 6em;
         }
-        .with-gift-aid .btn-outline-secondary {
-            background-color: #e1bee7;
-            color: #212529;
-        }
-        .with-gift-aid .btn-outline-secondary:hover {
-            background-color: #ce93d8;
-            color: #212529;
-        }
         .with-gift-aid label:after {
             content: '';
             display: inline-block;
@@ -88,6 +80,15 @@
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+        .accordion-button::after {
+            margin-left: 0;
+            margin-right: 0.5em;
+            order: -1;
+        }
+        .accordion-button {
+            display: flex;
+            justify-content: flex-start;
+        }
     </style>
 </head>
 <body>
@@ -108,7 +109,7 @@
         <div class="accordion" id="otherVisitorOptionsAccordian">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="otherOptionsHeading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#otherOptions" aria-expanded="false" aria-controls="otherOptions" style="background-color: #EEEEEE; border: 1px solid #6c757d; color: #6c757d;">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#otherOptions" aria-expanded="false" aria-controls="otherOptions" style="background-color: #EEEEEE; border: 1px solid #7b7b7b; color: #282828;">
                         Other Visitor Types & Gift Aid Options
                     </button>
                 </h2>
@@ -191,8 +192,8 @@
     const visitorTypes = [
         { id: 'adults', price: 8.50, isAdult: true, label: 'Adults', shortLabel: 'Adults', visibleByDefault: true, donation: 0 },
         { id: 'adults-gift-aid', price: 9.35, isAdult: true, label: 'Gift Aid Adults', shortLabel: 'Gift Aid Adults', visibleByDefault: true, donation: 0.85 },
-        { id: 'children', price: 0, isAdult: false, label: 'Children', shortLabel: 'Children', visibleByDefault: true, donation: 0 },
         { id: 'members', price: 0, isAdult: true, label: 'Members', shortLabel: 'Members', visibleByDefault: true, donation: 0 },
+        { id: 'children', price: 0, isAdult: false, label: 'Children', shortLabel: 'Children', visibleByDefault: true, donation: 0 },
         { id: 'carers', price: 0, isAdult: true, label: 'Carers', shortLabel: 'Carers', visibleByDefault: false, donation: 0 },
         { id: 'blue-light', price: 7.22, isAdult: true, label: 'Blue Light', shortLabel: 'Blue Light', visibleByDefault: false, donation: 0 },
         { id: 'blue-light-gift-aid', price: 7.94, isAdult: true, label: 'Gift Aid Blue Light', shortLabel: 'Gift Aid BL', visibleByDefault: false, donation: 0.72 },
