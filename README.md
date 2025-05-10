@@ -1,6 +1,4 @@
 NEXT/TODO
-- fix members only validation
-- other options, not happy with being able to collapse if some set esp w/o indication some set
 - Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
   - Add Local Resident
   - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”- better zoom controls; labelled? default 1.5?

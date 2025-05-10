@@ -322,6 +322,8 @@
         $('.visitor-count').on('input change', updatePriceAndVisibility);
     }
 
+    
+
     function initializeNumberControls() {
         const numberInputs = $('.no input[type="number"]');
 
@@ -342,6 +344,27 @@
                 numberInput[0].stepUp();
                 numberInput.trigger('input');
             });
+        });
+    }
+    
+    function initializeAccordionBehavior() {
+        const accordion = $('#otherOptions');
+        const accordionButton = $('.accordion-button');
+
+        // Prevent collapse if there are values
+        $('#otherVisitorOptionsAccordian').on('hide.bs.collapse', function (e) {
+            let hasValues = false;
+            $('#otherVisitorCounts .visitor-count').each(function() {
+                if (parseInt($(this).val()) > 0) {
+                    hasValues = true;
+                    return false; // break loop
+                }
+            });
+
+            if (hasValues) {
+                e.preventDefault();
+                alert('Please set all "Other Visitor Types" values to 0 before closing this section');
+            }
         });
     }
 
@@ -380,6 +403,7 @@
                 $('input, textarea, select').each(updateFieldFilledState);
                 updateFormDependencies();
                 updatePriceAndVisibility();
+                $('#otherOptions').collapse('hide');
             }, 0);
         });
 
@@ -468,6 +492,7 @@
         initializeZoomControls();
         initializeVisitorInputs();
         initializeNumberControls();
+        initializeAccordionBehavior();
         initializeFormStateManagement();
         initializeFormValidation();
         initializeResetConfirmation();
