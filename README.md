@@ -1,6 +1,4 @@
 NEXT/TODO
-- Balls... Single input for gift aid adults is insufficient as other types of adult can be gift aid
-  - Add separate controls for gift aid visitors
 - If children only, must be 13+
 - If members (and optional children, and first visit), don’t need any other info
 - Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)

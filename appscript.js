@@ -25,7 +25,12 @@ function doPost(e) {
   for (let i = 0; i < headings.length; i++) {
     const heading = headings[i];
     if (heading in data.record) {
-      recordToAppend[heading] = data.record[heading];
+      if (heading === 'timestamp') {
+        // Convert timestamp to date object as Sheets doesn't recognize ISO 8601 format
+        recordToAppend[heading] = new Date(data.record[heading]);
+      } else {
+        recordToAppend[heading] = data.record[heading];
+      }
     } else {
       recordToAppend[heading] = ''; // Add empty string if heading is not in record
     } 
