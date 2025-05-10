@@ -35,6 +35,5 @@ Shirley feedback / My observations
 Pete/James
 - minus smaller than plus (try different font)
 - tab order to avoid shirley issue of tabbing to Reason for Visit?
-- consider lower-casing
 - prevent double-tap zoom if possible
 - order of select items

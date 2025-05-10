@@ -89,6 +89,9 @@
             display: flex;
             justify-content: flex-start;
         }
+        .no .btn {
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -197,7 +200,7 @@
         { id: 'dogs', price: 0, isAdult: false, label: 'Dogs', shortLabel: 'Dogs', visibleByDefault: true, donation: 0 },
         { id: 'half-price-voucher', price: 4.25, isAdult: true, label: 'Half Price Voucher', shortLabel: '1/2 Price Voucher', visibleByDefault: false, donation: 0 },
         { id: 'half-price-voucher-gift-aid', price: 4.68, isAdult: true, label: 'Gift Aid Half Price Voucher', shortLabel: 'Gift Aid 1/2 Price', visibleByDefault: false, donation: 0.43 },
-        { id: 'full-price-voucher', price: 8.50, isAdult: true, label: 'Full Price Voucher', shortLabel: 'Full Price Voucher', visibleByDefault: false, donation: 0 }
+        { id: 'free-entry-voucher', price: 0, isAdult: true, label: 'Free Entry Voucher', shortLabel: 'Free Entry Voucher', visibleByDefault: false, donation: 0 }
     ];
 
     function calculateTotalPrice() {
@@ -224,7 +227,7 @@
         return totalPrice;
     }
 
-    function updatePriceAndVisibility() {
+    function updateFormSummaryAndVisibility() {
         let totalAdults = 0;
         let totalChildren = 0;
         let totalDogs = parseInt($('#dogs').val()) || 0;
@@ -355,7 +358,7 @@
         });
 
         $('[data-bs-toggle="tooltip"]').tooltip();
-        $('.visitor-count').on('input change', updatePriceAndVisibility);
+        $('.visitor-count').on('input change', updateFormSummaryAndVisibility);
     }
 
     
@@ -438,7 +441,7 @@
             setTimeout(function() {
                 $('input, textarea, select').each(updateFieldFilledState);
                 updateFormDependencies();
-                updatePriceAndVisibility();
+                updateFormSummaryAndVisibility();
                 $('#otherOptions').collapse('hide');
             }, 0);
         });
@@ -533,7 +536,7 @@
         initializeFormValidation();
         initializeResetConfirmation();
         initializeFormSubmission();
-        updatePriceAndVisibility();
+        updateFormSummaryAndVisibility();
     });
 })();
 </script>
