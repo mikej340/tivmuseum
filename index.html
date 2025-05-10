@@ -353,9 +353,9 @@
         });
     });
 
-    // add filled class to inputs that are filled
+    // form state management
     $(document).ready(function() {
-        function checkInput() {
+        function updateFieldFilledState() {
             if ($(this).is('input[type="number"]') && $(this).val() > 0 || !$(this).is('input[type="number"]') && $(this).val()) {
                 $(this).addClass('filled');
             } else {
@@ -363,40 +363,37 @@
             }
         }
 
-        // Trigger on input change
-        $('input, textarea, select').on('input change', checkInput);
+        function updateFormDependencies() {
+            const firstVisit = $('#first-visit').val();
+            const hearAboutUs = $('#hear-about-us');
+            const otherHearAboutUs = $('#other-hear-about-us');
 
-        // Trigger on form reset (with timeout to allow the form to reset)
+            // First Visit -> How did you hear about us
+            hearAboutUs.prop('disabled', firstVisit !== 'yes');
+            
+            // How did you hear about us -> Other specification
+            if (hearAboutUs.val() === 'other') {
+                otherHearAboutUs.show().prop('disabled', false);
+            } else {
+                otherHearAboutUs.hide().prop('disabled', true);
+            }
+        }
+
+        // Attach event listeners
+        $('input, textarea, select').on('input change', updateFieldFilledState);
+        $('#first-visit, #hear-about-us').on('change', updateFormDependencies);
+        
+        // Handle form reset
         $('form').on('reset', function() {
             setTimeout(function() {
-                $('input, textarea, select').each(checkInput);
+                $('input, textarea, select').each(updateFieldFilledState);
+                updateFormDependencies();
             }, 0);
         });
 
-        // Trigger the input event on page load
-        $('input, textarea, select').each(checkInput);
-    });
-
-    // enable/disable "How did you hear about us?" based on "First Visit?"
-    $(document).ready(function() {
-        $('#first-visit').change(function() {
-            if ($(this).val() === 'yes') {
-                $('#hear-about-us').prop('disabled', false);
-            } else {
-                $('#hear-about-us').prop('disabled', true);
-            }
-        });
-    });
-
-    // show/hide "Other" input based on "How did you hear about us?"
-    $(document).ready(function() {
-        $('#hear-about-us').change(function() {
-            if ($(this).val() === 'other') {
-                $('#other-hear-about-us').show().prop('disabled', false);
-            } else {
-                $('#other-hear-about-us').hide().prop('disabled', true);
-            }
-        });
+        // Initialize on page load
+        $('input, textarea, select').each(updateFieldFilledState);
+        updateFormDependencies();
     });
 
     // don't submit the form if all number inputs are 0

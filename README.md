@@ -1,6 +1,6 @@
 NEXT/TODO
-- If children only, must be 13+
-- If members (and optional children, and first visit), don’t need any other info
+- fix members only validation
+- other options, not happy with being able to collapse if some set esp w/o indication some set
 - Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
   - Add Local Resident
   - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”- better zoom controls; labelled? default 1.5?
@@ -20,6 +20,9 @@ NEXT/TODO
 - Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
 - Also link to GitHub/documentation?
 - dont allow submission if only dogs!
+- store config in sheet
+  - visitor types
+  - dropdown options
 
 
 Shirley feedback / My observations
