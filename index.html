@@ -185,7 +185,57 @@
 </body>
 </html>
 <script>
+(() => {
     const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbzKUXx40l1FKaE5oiv2bQTCEK3Km-93zEd3pfYv9mYcIaT7Th1jOiRiZeEIfZ7oigxIfw/exec';
+
+    // Move visitor types to global scope
+    const visitorTypes = [
+        { id: 'adults', price: 8.50, isAdult: true, label: 'Adults', shortLabel: 'Adults', visibleByDefault: true, donation: 0 },
+        { id: 'adults-gift-aid', price: 9.35, isAdult: true, label: 'Gift Aid Adults', shortLabel: 'Gift Aid Adults', visibleByDefault: true, donation: 0.85 },
+        { id: 'children', price: 0, isAdult: false, label: 'Children', shortLabel: 'Children', visibleByDefault: true, donation: 0 },
+        { id: 'members', price: 0, isAdult: true, label: 'Members', shortLabel: 'Members', visibleByDefault: true, donation: 0 },
+        { id: 'carers', price: 0, isAdult: true, label: 'Carers', shortLabel: 'Carers', visibleByDefault: false, donation: 0 },
+        { id: 'blue-light', price: 7.22, isAdult: true, label: 'Blue Light', shortLabel: 'Blue Light', visibleByDefault: false, donation: 0 },
+        { id: 'blue-light-gift-aid', price: 7.94, isAdult: true, label: 'Gift Aid Blue Light', shortLabel: 'Gift Aid BL', visibleByDefault: false, donation: 0.72 },
+        { id: 'dogs', price: 0, isAdult: false, label: 'Dogs', shortLabel: 'Dogs', visibleByDefault: true, donation: 0 },
+        { id: 'half-price-voucher', price: 4.25, isAdult: true, label: 'Half Price Voucher', shortLabel: '1/2 Price Voucher', visibleByDefault: false, donation: 0 },
+        { id: 'half-price-voucher-gift-aid', price: 4.68, isAdult: true, label: 'Gift Aid Half Price Voucher', shortLabel: 'Gift Aid 1/2 Price', visibleByDefault: false, donation: 0.43 },
+        { id: 'full-price-voucher', price: 8.50, isAdult: true, label: 'Full Price Voucher', shortLabel: 'Full Price Voucher', visibleByDefault: false, donation: 0 }
+    ];
+
+    // Move function to global scope
+    function updatePriceAndVisibility() {
+        let totalPrice = 0;
+        let totalAdults = 0;
+        let totalChildren = 0;
+        const totalMembers = parseInt($('#members').val()) || 0;
+
+        visitorTypes.forEach(type => {
+            const count = parseInt($(`#${type.id}`).val()) || 0;
+            totalPrice += count * type.price;
+
+            if (type.isAdult) {
+                totalAdults += count;
+            } else if (type.id === 'children') {
+                totalChildren += count;
+            }
+        });
+
+        // Apply special pricing for children-only visits
+        if (totalChildren > 0 && totalAdults === 0) {
+            totalPrice += totalChildren * 1;
+        }
+
+        $('#price').val(totalPrice.toFixed(2));
+
+        // Toggle visibility and required state of additional fields
+        const isMembersOnly = totalAdults > 0 && totalMembers === totalAdults;
+        $('.grid-container.other').toggle(!isMembersOnly);
+        $('#members-only-message').toggle(isMembersOnly);
+        
+        // Update required attributes
+        $('#postcode, #first-visit, #hear-about-us').prop('required', !isMembersOnly);
+    }
 
     // Prompt for token
     function promptForToken(clearExisting = false) {
@@ -245,21 +295,6 @@
 
     // visitor number inputs
     $(document).ready(function() {
-        // Visitor types
-        const visitorTypes = [
-            { id: 'adults', price: 8.50, isAdult: true, label: 'Adults', shortLabel: 'Adults', visibleByDefault: true, donation: 0 },
-            { id: 'adults-gift-aid', price: 9.35, isAdult: true, label: 'Gift Aid Adults', shortLabel: 'Gift Aid Adults', visibleByDefault: true, donation: 0.85 },
-            { id: 'children', price: 0, isAdult: false, label: 'Children', shortLabel: 'Children', visibleByDefault: true, donation: 0 },
-            { id: 'members', price: 0, isAdult: true, label: 'Members', shortLabel: 'Members', visibleByDefault: true, donation: 0 },
-            { id: 'carers', price: 0, isAdult: true, label: 'Carers', shortLabel: 'Carers', visibleByDefault: false, donation: 0 },
-            { id: 'blue-light', price: 7.22, isAdult: true, label: 'Blue Light', shortLabel: 'Blue Light', visibleByDefault: false, donation: 0 },
-            { id: 'blue-light-gift-aid', price: 7.94, isAdult: true, label: 'Gift Aid Blue Light', shortLabel: 'Gift Aid BL', visibleByDefault: false, donation: 0.72 },
-            { id: 'dogs', price: 0, isAdult: false, label: 'Dogs', shortLabel: 'Dogs', visibleByDefault: true, donation: 0 },
-            { id: 'half-price-voucher', price: 4.25, isAdult: true, label: 'Half Price Voucher', shortLabel: '1/2 Price Voucher', visibleByDefault: false, donation: 0 },
-            { id: 'half-price-voucher-gift-aid', price: 4.68, isAdult: true, label: 'Gift Aid Half Price Voucher', shortLabel: 'Gift Aid 1/2 Price', visibleByDefault: false, donation: 0.43 },
-            { id: 'full-price-voucher', price: 8.50, isAdult: true, label: 'Full Price Voucher', shortLabel: 'Full Price Voucher', visibleByDefault: false, donation: 0 }
-        ];
-
         // Build visitor count inputs dynamically
         visitorTypes.forEach(type => {
             const template = $('#visitor-count-template').html();
@@ -289,41 +324,6 @@
 
         // Initialize tooltips
         $('[data-bs-toggle="tooltip"]').tooltip();
-
-        // Update price and visibility logic
-        function updatePriceAndVisibility() {
-            let totalPrice = 0;
-            let totalAdults = 0;
-            let totalChildren = 0;
-            const totalMembers = parseInt($('#members').val()) || 0;
-
-            visitorTypes.forEach(type => {
-                const count = parseInt($(`#${type.id}`).val()) || 0;
-                totalPrice += count * type.price;
-
-                if (type.isAdult) {
-                    totalAdults += count;
-                } else if (type.id === 'children') {
-                    totalChildren += count;
-                }
-            });
-
-            // Apply special pricing for children-only visits
-            if (totalChildren > 0 && totalAdults === 0) {
-                totalPrice += totalChildren * 1;
-            }
-
-            $('#price').val(totalPrice.toFixed(2));
-
-            // Toggle visibility of additional fields
-            if (totalAdults > 0 && totalMembers === totalAdults) {
-                $('.grid-container.other').hide();
-                $('#members-only-message').show();
-            } else {
-                $('.grid-container.other').show();
-                $('#members-only-message').hide();
-            }
-        }
 
         // Attach event listeners
         $('.visitor-count').on('input change', updatePriceAndVisibility);
@@ -388,6 +388,7 @@
             setTimeout(function() {
                 $('input, textarea, select').each(updateFieldFilledState);
                 updateFormDependencies();
+                updatePriceAndVisibility();
             }, 0);
         });
 
@@ -461,7 +462,7 @@
                     case 'Success':
                         showAlert('Saved successfully');
                         $('form').trigger('reset');
-                        break;
+                                                break;
                     case 'Unauthorized':
                         alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
                         promptForToken(true);
@@ -478,4 +479,5 @@
             });
         });
     });
+})();
 </script>
