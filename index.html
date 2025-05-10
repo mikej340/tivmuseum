@@ -188,7 +188,6 @@
 (() => {
     const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbzKUXx40l1FKaE5oiv2bQTCEK3Km-93zEd3pfYv9mYcIaT7Th1jOiRiZeEIfZ7oigxIfw/exec';
 
-    // Move visitor types to global scope
     const visitorTypes = [
         { id: 'adults', price: 8.50, isAdult: true, label: 'Adults', shortLabel: 'Adults', visibleByDefault: true, donation: 0 },
         { id: 'adults-gift-aid', price: 9.35, isAdult: true, label: 'Gift Aid Adults', shortLabel: 'Gift Aid Adults', visibleByDefault: true, donation: 0.85 },
@@ -203,7 +202,6 @@
         { id: 'full-price-voucher', price: 8.50, isAdult: true, label: 'Full Price Voucher', shortLabel: 'Full Price Voucher', visibleByDefault: false, donation: 0 }
     ];
 
-    // Move function to global scope
     function updatePriceAndVisibility() {
         let totalPrice = 0;
         let totalAdults = 0;
@@ -270,13 +268,13 @@
         validateToken();
     }
 
-    // check token on page load
-    $(document).ready(function() {
-        promptForToken();
-    });
+    function showAlert(message, duration = 3000) {
+        const alert = $('#alertMessage');
+        alert.text(message).fadeIn();
+        setTimeout(() => alert.fadeOut(), duration);
+    }
 
-    // add zoom buttons to the page
-    $(document).ready(function() {
+    function initializeZoomControls() {
         const zoomButtons = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom buttons"></div>');
         const zoomLevels = [1, 1.25, 1.5, 1.75];
 
@@ -291,11 +289,9 @@
         });
 
         $('body').prepend(zoomButtons);
-    });
+    }
 
-    // visitor number inputs
-    $(document).ready(function() {
-        // Build visitor count inputs dynamically
+    function initializeVisitorInputs() {
         visitorTypes.forEach(type => {
             const template = $('#visitor-count-template').html();
             const newElement = $(template).clone();
@@ -322,15 +318,11 @@
             }
         });
 
-        // Initialize tooltips
         $('[data-bs-toggle="tooltip"]').tooltip();
-
-        // Attach event listeners
         $('.visitor-count').on('input change', updatePriceAndVisibility);
-    });
+    }
 
-    // add plus and minus buttons to number inputs
-    $(document).ready(function() {
+    function initializeNumberControls() {
         const numberInputs = $('.no input[type="number"]');
 
         numberInputs.each(function() {
@@ -351,10 +343,9 @@
                 numberInput.trigger('input');
             });
         });
-    });
+    }
 
-    // form state management
-    $(document).ready(function() {
+    function initializeFormStateManagement() {
         function updateFieldFilledState() {
             if ($(this).is('input[type="number"]') && $(this).val() > 0 || !$(this).is('input[type="number"]') && $(this).val()) {
                 $(this).addClass('filled');
@@ -395,10 +386,9 @@
         // Initialize on page load
         $('input, textarea, select').each(updateFieldFilledState);
         updateFormDependencies();
-    });
+    }
 
-    // don't submit the form if all number inputs are 0
-    $(document).ready(function() {
+    function initializeFormValidation() {
         $('form').submit(function(event) {
             let sum = 0;
             $('.visitor-count').each(function() {
@@ -411,25 +401,17 @@
                 event.stopImmediatePropagation(); // Stop other submit listeners
             }
         });
-    });
+    }
 
-    // ask for confirmation before resetting the form
-    $(document).ready(function() {
+    function initializeResetConfirmation() {
         $('button[type="reset"]').click(function(event) {
             if (!confirm('Are you sure you want to reset the form?')) {
                 event.preventDefault();
             }
         });
-    });
-
-    function showAlert(message, duration = 3000) {
-        const alert = $('#alertMessage');
-        alert.text(message).fadeIn();
-        setTimeout(() => alert.fadeOut(), duration);
     }
 
-    // post form data to the Spreadsheet's Apps Script
-    $(document).ready(function() {
+    function initializeFormSubmission() {
         $('form').submit(function(event) {
             event.preventDefault();
 
@@ -478,6 +460,18 @@
                 submitButton.prop('disabled', false).text('Submit');
             });
         });
+    }
+
+    // Single document.ready that calls all initialization functions
+    $(document).ready(function() {
+        promptForToken();
+        initializeZoomControls();
+        initializeVisitorInputs();
+        initializeNumberControls();
+        initializeFormStateManagement();
+        initializeFormValidation();
+        initializeResetConfirmation();
+        initializeFormSubmission();
     });
 })();
 </script>
