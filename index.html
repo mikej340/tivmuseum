@@ -453,15 +453,23 @@
 
     function initializeFormValidation() {
         $('form').submit(function(event) {
-            let sum = 0;
+            let totalVisitors = 0;
+            let dogCount = parseInt($('#dogs').val()) || 0;
+            
             $('.visitor-count').each(function() {
-                sum += parseInt($(this).val());
+                if ($(this).attr('id') !== 'dogs') {
+                    totalVisitors += parseInt($(this).val()) || 0;
+                }
             });
 
-            if (sum === 0) {
-                alert('Please enter at least one visitor');
-                event.preventDefault(); // Prevent form submission
-                event.stopImmediatePropagation(); // Stop other submit listeners
+            if (totalVisitors === 0) {
+                if (dogCount > 0) {
+                    alert('Dogs must be accompanied by at least one visitor');
+                } else {
+                    alert('Please enter at least one visitor');
+                }
+                event.preventDefault();
+                event.stopImmediatePropagation();
             }
         });
     }
@@ -505,9 +513,9 @@
                 const res = await response.text();
                 switch (res) {
                     case 'Success':
-                        showAlert('Saved successfully');
+                        showAlert('✓ Visit Recorded', 5000);
                         $('form').trigger('reset');
-                                                break;
+                        break;
                     case 'Unauthorized':
                         alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
                         promptForToken(true);
