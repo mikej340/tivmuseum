@@ -15,7 +15,6 @@ NEXT/TODO
 - Link (from menu?) to spreadsheet
 - Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
 - Also link to GitHub/documentation?
-- dont allow submission if only dogs!
 - store config in sheet
   - visitor types
   - dropdown options

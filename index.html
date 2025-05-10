@@ -187,7 +187,7 @@
 </html>
 <script>
 (() => {
-    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbzKUXx40l1FKaE5oiv2bQTCEK3Km-93zEd3pfYv9mYcIaT7Th1jOiRiZeEIfZ7oigxIfw/exec';
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbyxHZBcYsJ-AF9Xf2VyFBbYP7QhSJGoaBevq8I_RXnXe6_lYYy0ntYpgs-9z8DNwRLM4w/exec';
 
     const visitorTypes = [
         { id: 'adults', price: 8.50, isAdult: true, label: 'Adults', shortLabel: 'Adults', visibleByDefault: true, donation: 0 },
@@ -521,7 +521,7 @@
                         promptForToken(true);
                         break;
                     default:
-                        throw new Error('An error occurred while submitting the form');
+                        throw new Error('Unexpected response from server: ' + res);
                 }
             })
             .catch(error => {

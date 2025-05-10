@@ -36,6 +36,13 @@ function doPost(e) {
     } 
   }
 
+  // ensure no entries in data.record are missing from the sheet
+  for (const key in data.record) {
+    if (!headings.includes(key)) {
+      return ContentService.createTextOutput(`"${key}" not found in sheet headings.`).setMimeType(ContentService.MimeType.TEXT);
+    }
+  }
+
   sheet.appendRow(Object.values(recordToAppend));
 
   return ContentService.createTextOutput('Success').setMimeType(ContentService.MimeType.TEXT);
