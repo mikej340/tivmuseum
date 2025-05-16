@@ -4,6 +4,7 @@ NEXT/TODO
   - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”
 - half price has variants! see photos
   - may not be needed on ledger? only on till?
+- add group discount (if Carrie says it's needed on ledger record)
 - better zoom controls; labelled? default 1.5?
   - or just fix at 150% as that's ideal?
 - use localstorage to persist? (may not need to if never navigate)
