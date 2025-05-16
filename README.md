@@ -1,7 +1,9 @@
 NEXT/TODO
-- (need full list) Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
+- Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
   - Add Local Resident
   - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”
+- half price has variants! see photos
+  - may not be needed on ledger? only on till?
 - better zoom controls; labelled? default 1.5?
   - or just fix at 150% as that's ideal?
 - use localstorage to persist? (may not need to if never navigate)
