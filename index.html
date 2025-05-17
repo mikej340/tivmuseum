@@ -159,14 +159,6 @@
             <div>
                 <label for="reason-for-visit" class="form-label">Reason for Visit</label>
                 <select id="reason-for-visit" name="reason-for-visit" class="form-control form-control-lg">
-                    <option value="visitor-to-town">1. Visitor to the Town</option>
-                    <option value="craft-activities">2. Craft Activities</option>
-                    <option value="special-event-exhibition">3. Special Event / Exhibition</option>
-                    <option value="tivvy-bumper-rail-enthusiast">4. Tivvy Bumper/Rail Enthusiast</option>
-                    <option value="using-tourist-information-service">5. Using TIC</option>
-                    <option value="just-visiting" selected>6. Just Visiting</option>
-                    <option value="research-visit">7. Research Visit</option>
-                    <option value="other">8. Other</option>
                 </select>
             </div>
             <div>
@@ -188,18 +180,6 @@
             <div style="grid-column: span 2;">
                 <label for="hear-about-us" class="form-label">How did you hear about us?</label>
                 <select id="hear-about-us" name="hear-about-us" class="form-control form-control-lg" disabled required>
-                    <option value="" disabled selected></option>
-                    <option value="newspaper-magazine">A. Newspaper / Magazine</option>
-                    <option value="poster">B. Poster</option>
-                    <option value="advertising-display">C. Advertising Display - Leisure Centre/Market</option>
-                    <option value="leaflet">D. Leaflet</option>
-                    <option value="signs-in-town">E. Signs in the town</option>
-                    <option value="word-of-mouth">F. Word of mouth</option>
-                    <option value="website">G. Website</option>
-                    <option value="previous-visit">H. Previous Visit</option>
-                    <option value="social-media">I. Social Media</option>
-                    <option value="local-resident">J. Local Resident</option>
-                    <option value="other">K. Other - please specify</option>
                 </select>
                 <input type="text" id="other-hear-about-us" name="other-hear-about-us" class="form-control form-control-lg" style="display: none;" placeholder="Please specify" disabled required>
             </div>
@@ -225,7 +205,7 @@
 </html>
 <script>
 (() => {
-    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbyqLYH22zYanl3GLOKz9tI1yP0TEL44lZ2uwuGsXRyzczPbvZ6HaBhPYaCV-LlBCL-W1g/exec';
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxxbtDkdIgVZToqubWbFonLrvR-XK6AYhZzKUK6y5U_k7JA8JSJbwkaBH46h3T2kLktYg/exec';
 
     const visitorTypes = [
         { id: 'adults', price: 8.50, isAdult: true, label: 'Adults', shortLabel: 'Adults', visibleByDefault: true, donation: 0 },
@@ -240,6 +220,12 @@
         { id: 'half-price-voucher-gift-aid', price: 4.67, isAdult: true, label: 'Gift Aid Half Price Voucher', shortLabel: 'Gift Aid 1/2 Price', visibleByDefault: false, donation: 0.42 },
         { id: 'free-entry-voucher', price: 0, isAdult: true, label: 'Free Entry Voucher', shortLabel: 'Free Entry Voucher', visibleByDefault: false, donation: 0 }
     ];
+
+    // State to manage form data
+    const formState = {
+        defaultReasonForVisit: '',
+        heardAboutUsOther: 'Z. Other - please specify'
+    };
 
     function calculateTotalPrice() {
         let totalPrice = 0;
@@ -322,7 +308,7 @@
                 const token = prompt('Please enter the secret token:');
                 if (token) {
                     try {
-                        const response = await fetch(`${appsScriptUrl}?authToken=${token}`, {
+                        const response = await fetch(`${appsScriptUrl}?action=checkCredentials&authToken=${token}`, {
                             method: 'GET',
                             headers: {
                                 "Content-Type": "text/plain;charset=utf-8"
@@ -463,10 +449,11 @@
             hearAboutUs.prop('disabled', firstVisit !== 'yes');
             
             // How did you hear about us -> Other specification
-            if (hearAboutUs.val() === 'other') {
+            if (hearAboutUs.val() === formState.heardAboutUsOther) {
                 otherHearAboutUs.show().prop('disabled', false);
             } else {
                 otherHearAboutUs.hide().prop('disabled', true);
+                otherHearAboutUs.val(''); // Clear the other field when not visible
             }
         }
 
@@ -481,6 +468,11 @@
                 updateFormDependencies();
                 updateFormSummaryAndVisibility();
                 $('#otherOptions').collapse('hide');
+                
+                // Restore defaults
+                if (formState.defaultReasonForVisit) {
+                    $('#reason-for-visit').val(formState.defaultReasonForVisit);
+                }
             }, 0);
         });
 
@@ -605,6 +597,50 @@
             });
     }
 
+    function initializeReasonForVisit() {
+        return fetch(`${appsScriptUrl}?action=getReasonsForVisit&authToken=${localStorage.getItem('authToken')}`)
+            .then(response => response.text())
+            .then(text => {
+                const data = JSON.parse(text);
+                const select = $('#reason-for-visit');
+                select.empty();
+                
+                data.forEach(row => {
+                    const option = $('<option>', {
+                        value: row[0],
+                        text: row[0]
+                    });
+                    
+                    // If second column is 'Y', set as default selected
+                    if (row[1] === 'Y') {
+                        option.prop('selected', true);
+                        formState.defaultReasonForVisit = row[0];
+                    }
+                    
+                    select.append(option);
+                });
+            });
+    }
+
+    function initializeHowHeardAboutUs() {
+        return fetch(`${appsScriptUrl}?action=getHeardAboutUs&authToken=${localStorage.getItem('authToken')}`)
+            .then(response => response.text())
+            .then(text => {
+                const data = JSON.parse(text);
+                const select = $('#hear-about-us');
+                select.empty();
+                select.append('<option value="" disabled selected></option>');
+                
+                data.forEach(row => {
+                    const option = $('<option>', {
+                        value: row[0],
+                        text: row[0]
+                    });
+                    select.append(option);
+                });
+            });
+    }
+
     // Single document.ready that calls all initialization functions
     $(document).ready(function() {
         promptForToken();
@@ -612,12 +648,23 @@
         initializeVisitorInputs();
         initializeNumberControls();
         initializeAccordionBehavior();
-        initializeFormStateManagement();
         initializeFormValidation();
         initializeResetConfirmation();
         initializeFormSubmission();
         initializePostcodeModal();
-        updateFormSummaryAndVisibility();
+
+        // Initialize dynamic data first, then form state
+        Promise.all([
+            initializeReasonForVisit(),
+            initializeHowHeardAboutUs()
+        ])
+        .then(() => {
+            initializeFormStateManagement();
+            updateFormSummaryAndVisibility();
+        })
+        .catch(error => {
+            console.error('Error initializing form:', error);
+        });
     });
 })();
 </script>

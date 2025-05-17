@@ -1,15 +1,55 @@
-// Google App Script
+// Google Apps Script
+
+// Using ContentService.MimeType.TEXT allows cross-origin requests without CORS issues
+// This works because text/plain responses are considered "simple" by browsers
+// and don't trigger preflight requests, unlike application/json
+
 const authToken = 'OkfnEVNjML'; // Change secret key as needed (TODO: move to separate file and don't commit to repo)
 
-// Check off token on get
+// Get
 function doGet(e) {
   if (e.parameter.authToken !== authToken) {
     return ContentService.createTextOutput('Unauthorized').setMimeType(ContentService.MimeType.TEXT);
   }
 
-  return ContentService.createTextOutput('Authorized').setMimeType(ContentService.MimeType.TEXT);
+  const action = e.parameter.action || 'checkCredentials';
+
+  switch (action) {
+    case 'checkCredentials':
+      return ContentService.createTextOutput('Authorized').setMimeType(ContentService.MimeType.TEXT);
+    
+    case 'getReasonsForVisit':
+      const reasonsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Reason For Visit');
+      const reasonsData = reasonsSheet.getDataRange().getValues();
+
+      // Skip header row
+      reasonsData.shift();
+
+      const reasons = reasonsData.map(row => ({
+        value: row[0],
+        default: row[1] // Y or blank
+      }));
+      
+      return ContentService.createTextOutput(JSON.stringify(reasonsData))
+        .setMimeType(ContentService.MimeType.TEXT);
+
+    case 'getHeardAboutUs':
+      const heardSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('How Did You Hear About Us');
+      const heardData = heardSheet.getDataRange().getValues();
+
+      // Skip header row
+      heardData.shift();
+      
+      return ContentService.createTextOutput(JSON.stringify(heardData))
+        .setMimeType(ContentService.MimeType.TEXT);
+    
+    default:
+      return ContentService.createTextOutput('Invalid action')
+        .setMimeType(ContentService.MimeType.TEXT);
+  }
 }
 
+// Post
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
 
