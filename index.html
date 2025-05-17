@@ -127,13 +127,16 @@
             bottom: 0;
             background: #f4f4f4;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 1rem;
             z-index: 9999;
         }
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
+        .loading-status {
+            color: #6c757d;
+            font-size: 1.1rem;
+            text-align: center;
         }
         form {
             display: none;
@@ -145,6 +148,7 @@
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
+        <div id="loadingStatus" class="loading-status">Initializing...</div>
     </div>
     <div id="alertMessage" class="alert-float alert alert-success"></div>
     <!-- Template for visitor count inputs -->
@@ -349,7 +353,7 @@
         return token;
     }
 
-    function promptForToken(clearExisting = false) {
+    function authenticate(clearExisting = false) {
         if (clearExisting) {
             localStorage.removeItem('authToken');
         }
@@ -618,7 +622,7 @@
                         break;
                     case 'Unauthorized':
                         alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
-                        promptForToken(true);
+                        authenticate(true);
                         break;
                     default:
                         throw new Error('Unexpected response from server: ' + res);
@@ -713,17 +717,22 @@
 
     // Single document.ready that calls all initialization functions
     $(document).ready(function() {
-        initializeZoomControls();
 
+        function updateLoadingStatus(message) {
+            $('#loadingStatus').text(message);
+        }
         // Initialize everything in sequence
-        promptForToken()
+        updateLoadingStatus('Authenticating...');
+        authenticate()
             .then(() => {
+                updateLoadingStatus('Loading form options...');
                 return Promise.all([
                     initializeReasonForVisit(),
                     initializeHowHeardAboutUs()
                 ]);
             })
             .then(() => {
+                initializeZoomControls();
                 initializeVisitorInputs();
                 initializeNumberControls();
                 initializeAccordionBehavior();
@@ -739,8 +748,9 @@
                 $('form').fadeIn();
             })
             .catch(error => {
+                $('.spinner-border').hide();
+                updateLoadingStatus('Error initializing form: ' + (error.message || 'An error occurred'));
                 console.error('Error initializing form:', error);
-                alert('There was an error loading the form. Please refresh the page and try again.');
             });
     });
 })();
