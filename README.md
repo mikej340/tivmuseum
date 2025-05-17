@@ -12,12 +12,13 @@ NEXT/TODO
 - gift aid price col in SS
 - Add worksheet showing totals per day
 - Link (from menu?) to spreadsheet
-- Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
+  - Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
 - Also link to GitHub/documentation?
 - store config in sheet
   - visitor types
   - dropdown options
 - Ability to set key via query string
+- Remove key from code base
 
 
 Shirley feedback / My observations
