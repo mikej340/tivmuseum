@@ -233,21 +233,9 @@
 </html>
 <script>
 (() => {
-    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxxbtDkdIgVZToqubWbFonLrvR-XK6AYhZzKUK6y5U_k7JA8JSJbwkaBH46h3T2kLktYg/exec';
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw1C2JmAVNmTamt-mFVW3OIE98qHKRCZgWyFbq4PHx3xjBF-qlgZzB0Qa9MCTiZX4jCMQ/exec';
 
-    const visitorTypes = [
-        { id: 'adults', price: 8.50, isAdult: true, label: 'Adults', shortLabel: 'Adults', visibleByDefault: true, donation: 0 },
-        { id: 'adults-gift-aid', price: 9.35, isAdult: true, label: 'Gift Aid Adults', shortLabel: 'Gift Aid Adults', visibleByDefault: true, donation: 0.85 },
-        { id: 'members', price: 0, isAdult: true, label: 'Members', shortLabel: 'Members', visibleByDefault: true, donation: 0 },
-        { id: 'children', price: 0, isAdult: false, label: 'Children', shortLabel: 'Children', visibleByDefault: true, donation: 0 },
-        { id: 'carers', price: 0, isAdult: true, label: 'Carers', shortLabel: 'Carers', visibleByDefault: false, donation: 0 },
-        { id: 'blue-light', price: 7.22, isAdult: true, label: 'Blue Light', shortLabel: 'Blue Light', visibleByDefault: false, donation: 0 },
-        { id: 'blue-light-gift-aid', price: 7.94, isAdult: true, label: 'Gift Aid Blue Light', shortLabel: 'Gift Aid BL', visibleByDefault: false, donation: 0.72 },
-        { id: 'dogs', price: 0, isAdult: false, label: 'Dogs', shortLabel: 'Dogs', visibleByDefault: true, donation: 0 },
-        { id: 'half-price-voucher', price: 4.25, isAdult: true, label: 'Half Price Voucher', shortLabel: '1/2 Price Voucher', visibleByDefault: false, donation: 0 },
-        { id: 'half-price-voucher-gift-aid', price: 4.67, isAdult: true, label: 'Gift Aid Half Price Voucher', shortLabel: 'Gift Aid 1/2 Price', visibleByDefault: false, donation: 0.42 },
-        { id: 'free-entry-voucher', price: 0, isAdult: true, label: 'Free Entry Voucher', shortLabel: 'Free Entry Voucher', visibleByDefault: false, donation: 0 }
-    ];
+    let visitorTypes = []; // This will be populated dynamically
 
     // State to manage form data
     const formState = {
@@ -671,6 +659,26 @@
             });
     }
 
+    function initializeVisitorTypes() {
+        return fetch(`${appsScriptUrl}?action=getVisitorTypes&authToken=${localStorage.getItem('authToken')}`)
+            .then(response => response.text())
+            .then(text => {
+                const data = JSON.parse(text);
+                visitorTypes = data.map(row => {
+                    
+                    return {
+                        id: row[0],
+                        label: row[1],
+                        shortLabel: row[2],
+                        price: row[3] ? parseFloat(row[3]) : 0,
+                        isAdult: row[4].toLowerCase() === 'yes',
+                        visibleByDefault: row[5].toLowerCase() === 'yes', // Column is "Frequently used" in the sheet
+                        donation: row[6] ? parseFloat(row[6]) : 0
+                    };
+                });
+            });
+    }
+
     function initializeReasonForVisit() {
         return fetch(`${appsScriptUrl}?action=getReasonsForVisit&authToken=${localStorage.getItem('authToken')}`)
             .then(response => response.text())
@@ -686,7 +694,7 @@
                     });
                     
                     // If second column is 'Y', set as default selected
-                    if (row[1] === 'Y') {
+                    if (row[1] === 'Yes') {
                         option.prop('selected', true);
                         formState.defaultReasonForVisit = row[0];
                     }
@@ -727,6 +735,7 @@
             .then(() => {
                 updateLoadingStatus('Loading form options...');
                 return Promise.all([
+                    initializeVisitorTypes(),
                     initializeReasonForVisit(),
                     initializeHowHeardAboutUs()
                 ]);

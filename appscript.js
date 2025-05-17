@@ -18,6 +18,16 @@ function doGet(e) {
     case 'checkCredentials':
       return ContentService.createTextOutput('Authorized').setMimeType(ContentService.MimeType.TEXT);
     
+    case 'getVisitorTypes':
+      const visitorTypesSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Visitor Types');
+      const visitorTypesData = visitorTypesSheet.getDataRange().getValues();
+
+      // Skip header row
+      visitorTypesData.shift();
+      
+      return ContentService.createTextOutput(JSON.stringify(visitorTypesData))
+        .setMimeType(ContentService.MimeType.TEXT);
+
     case 'getReasonsForVisit':
       const reasonsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Reason For Visit');
       const reasonsData = reasonsSheet.getDataRange().getValues();
@@ -27,7 +37,7 @@ function doGet(e) {
 
       const reasons = reasonsData.map(row => ({
         value: row[0],
-        default: row[1] // Y or blank
+        default: row[1] // Yes or blank
       }));
       
       return ContentService.createTextOutput(JSON.stringify(reasonsData))
