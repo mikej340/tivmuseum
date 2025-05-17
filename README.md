@@ -9,7 +9,6 @@ NEXT/TODO
 - figure out how gonna manage submissions
   - with ability to edit?
 - web app would be preferable, remove confusion of browser interface
-- gift aid price col in SS
 - Add worksheet showing totals per day
 - Link (from menu?) to spreadsheet
   - Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
