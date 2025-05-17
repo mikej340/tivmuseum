@@ -17,7 +17,7 @@ function doPost(e) {
     return ContentService.createTextOutput('Unauthorized').setMimeType(ContentService.MimeType.TEXT);
   }
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1'); // Change sheet name as needed
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Visitors'); // Change sheet name as needed
   const headings = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
 
   // Loop through headings and if included in record, then add to records to append to the sheet
