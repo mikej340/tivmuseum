@@ -5,7 +5,6 @@ NEXT/TODO
 - better zoom controls; labelled? default 1.5?
   - or just fix at 150% as that's ideal?
 - use localstorage to persist? (may not need to if never navigate)
-- Cancel link when entering post code (next to label, on tablet only, as it’s not clear/easy to dismiss keyboard)
 - notes? e.g upgrade to membership
 - figure out how gonna manage submissions
   - with ability to edit?
@@ -18,6 +17,7 @@ NEXT/TODO
 - store config in sheet
   - visitor types
   - dropdown options
+- Ability to set key via query string
 
 
 Shirley feedback / My observations
