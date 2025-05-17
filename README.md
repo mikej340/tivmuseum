@@ -1,7 +1,4 @@
 NEXT/TODO
-- Letters/numbers against reason and how heard about (as whilst moving to app, some will still be entered on sheet and entered via app later)
-  - Add Local Resident
-  - Double check, because also put “tivvy bumper trial” not “tivvy bumper/rail enthusiast”
 - half price has variants! see photos
   - may not be needed on ledger? only on till?
 - add group discount (if Carrie says it's needed on ledger record)
