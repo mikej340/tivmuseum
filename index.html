@@ -233,6 +233,16 @@
 </html>
 <script>
 (() => {
+    // Polyfill for android 7.0 support
+    if (!Object.fromEntries) {
+        Object.fromEntries = function(iterable) {
+            return [...iterable].reduce((obj, [key, val]) => {
+            obj[key] = val;
+            return obj;
+            }, {});
+        };
+    }
+
     const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw1C2JmAVNmTamt-mFVW3OIE98qHKRCZgWyFbq4PHx3xjBF-qlgZzB0Qa9MCTiZX4jCMQ/exec';
 
     let visitorTypes = []; // This will be populated dynamically
