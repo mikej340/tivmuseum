@@ -1,4 +1,5 @@
 NEXT/TODO
+- review Pippa reports
 - half price has variants! see photos
   - may not be needed on ledger? only on till?
 - add group discount (if Carrie says it's needed on ledger record)
