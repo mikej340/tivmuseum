@@ -52,6 +52,7 @@
 - **Alternative processes**: 
   - record all visitors in till - not via register?
   - allow visitor to fill out some?
+- **Historic data**: possible to port over? Different data formats/sources to collate for Pippa (so could consider switching over end of year?)
 
 ---
 
@@ -65,6 +66,7 @@
   - Quick contact buttons for Carrie/Pippa/Mike (feedback?)
 - **Visitor categories**:
   - Useful to distinguish *Admitted Visitors* from *Non-Admitted* (e.g. TIC, Shop-only, Tots).
+- **Integrating with booking systems?**
 
 ---
 
