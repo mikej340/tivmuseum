@@ -162,22 +162,7 @@
     </template>
 
     <form action="/submit" method="post" autocomplete="off">
-        <div id="defaultVisitorCounts" class="grid-container visitor-counts">
-        </div>
-        <div class="accordion" id="otherVisitorOptionsAccordian">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="otherOptionsHeading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#otherOptions" aria-expanded="false" aria-controls="otherOptions" style="background-color: #EEEEEE; border: 1px solid #7b7b7b; color: #282828;">
-                        Other Visitor Types & Gift Aid Options
-                    </button>
-                </h2>
-                <div id="otherOptions" class="accordion-collapse collapse" aria-labelledby="otherOptionsHeading" data-bs-parent="#otherVisitorOptionsAccordian">
-                    <div class="accordion-body">
-                        <div id="otherVisitorCounts" class="grid-container visitor-counts">
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="visitorCounts" class="grid-container visitor-counts">
         </div>
         <div class="grid-container other">
             <div style="grid-column: 1;">
@@ -446,18 +431,12 @@
                 newElement.addClass('with-gift-aid');
             }
 
-            if (type.visibleByDefault) {
-                $('#defaultVisitorCounts').append(newElement);
-            } else {
-                $('#otherVisitorCounts').append(newElement);
-            }
+            $('#visitorCounts').append(newElement);
         });
 
         $('[data-bs-toggle="tooltip"]').tooltip();
         $('.visitor-count').on('input change', updateFormSummaryAndVisibility);
     }
-
-    
 
     function initializeNumberControls() {
         const numberInputs = $('.no input[type="number"]');
@@ -482,27 +461,6 @@
         });
     }
     
-    function initializeAccordionBehavior() {
-        const accordion = $('#otherOptions');
-        const accordionButton = $('.accordion-button');
-
-        // Prevent collapse if there are values
-        $('#otherVisitorOptionsAccordian').on('hide.bs.collapse', function (e) {
-            let hasValues = false;
-            $('#otherVisitorCounts .visitor-count').each(function() {
-                if (parseInt($(this).val()) > 0) {
-                    hasValues = true;
-                    return false; // break loop
-                }
-            });
-
-            if (hasValues) {
-                e.preventDefault();
-                alert('Please set all "Other Visitor Types" values to 0 before closing this section');
-            }
-        });
-    }
-
     function initializeFormStateManagement() {
         function updateFieldFilledState() {
             if ($(this).is('input[type="number"]') && $(this).val() > 0 || !$(this).is('input[type="number"]') && $(this).val()) {
@@ -539,7 +497,6 @@
                 $('input, textarea, select').each(updateFieldFilledState);
                 updateFormDependencies();
                 updateFormSummaryAndVisibility();
-                $('#otherOptions').collapse('hide');
                 
                 // Restore defaults
                 if (formState.defaultReasonForVisit) {
@@ -764,7 +721,6 @@
                 initializeZoomControls();
                 initializeVisitorInputs();
                 initializeNumberControls();
-                initializeAccordionBehavior();
                 initializeFormValidation();
                 initializeResetConfirmation();
                 initializeFormSubmission();
