@@ -171,7 +171,7 @@
             </div>
             <div>
                 <label for="reason-for-visit" class="form-label">Reason for Visit</label>
-                <select id="reason-for-visit" name="reason-for-visit" class="form-control form-control-lg">
+                <select id="reason-for-visit" name="reason-for-visit" class="form-control form-control-lg" required>
                 </select>
             </div>
             <div style="grid-column: 1;">
@@ -642,6 +642,7 @@
                 const data = JSON.parse(text);
                 const select = $('#reason-for-visit');
                 select.empty();
+                select.append('<option value="" disabled selected></option>');
                 
                 data.forEach(row => {
                     const option = $('<option>', {
