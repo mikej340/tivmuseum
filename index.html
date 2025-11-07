@@ -265,7 +265,6 @@
     function updateFormSummaryAndVisibility() {
         let totalAdults = 0;
         let totalChildren = 0;
-        let totalDogs = parseInt($('#dogs').val()) || 0;
         let totalVisitors = 0;
         const totalMembers = parseInt($('#members').val()) || 0;
 
@@ -276,10 +275,7 @@
             } else if (type.id === 'children') {
                 totalChildren += count;
             }
-            
-            if (type.id !== 'dogs') {
-                totalVisitors += count;
-            }
+            totalVisitors += count;
         });
 
         // Update summary message
@@ -289,9 +285,6 @@
         }
         if (totalChildren > 0) {
             summaryParts.push(`${totalChildren} ${totalChildren === 1 ? 'child' : 'children'}`);
-        }
-        if (totalDogs > 0) {
-            summaryParts.push(`${totalDogs} dog${totalDogs !== 1 ? 's' : ''}`);
         }
         
         let summaryText = summaryParts.join(', ');
@@ -513,20 +506,13 @@
     function initializeFormValidation() {
         $('form').submit(function(event) {
             let totalVisitors = 0;
-            let dogCount = parseInt($('#dogs').val()) || 0;
             
             $('.visitor-count').each(function() {
-                if ($(this).attr('id') !== 'dogs') {
-                    totalVisitors += parseInt($(this).val()) || 0;
-                }
+                totalVisitors += parseInt($(this).val()) || 0;
             });
 
             if (totalVisitors === 0) {
-                if (dogCount > 0) {
-                    alert('Dogs must be accompanied by at least one visitor');
-                } else {
-                    alert('Please enter at least one visitor');
-                }
+                alert('Please enter at least one visitor');
                 event.preventDefault();
                 event.stopImmediatePropagation();
             }
