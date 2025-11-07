@@ -227,7 +227,8 @@
     // State to manage form data
     const formState = {
         defaultReasonForVisit: '',
-        heardAboutUsOther: 'Other - please specify'
+        heardAboutUsOther: 'Other - please specify', // Must match spreadsheet ID
+        childTypeId: 'child' // Must match spreadsheet ID
     };
 
     function calculateTotalPrice() {
@@ -241,7 +242,7 @@
 
             if (type.isAdult) {
                 totalAdults += count;
-            } else if (type.id === 'children') {
+            } else if (type.id === formState.childTypeId) {
                 totalChildren += count;
             }
         });
@@ -264,7 +265,7 @@
             const count = parseInt($(`#${type.id}`).val()) || 0;
             if (type.isAdult) {
                 totalAdults += count;
-            } else if (type.id === 'children') {
+            } else if (type.id === formState.childTypeId) {
                 totalChildren += count;
             }
             totalVisitors += count;
