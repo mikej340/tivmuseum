@@ -174,7 +174,7 @@
                 <select id="reason-for-visit" name="reason-for-visit" class="form-control form-control-lg" required>
                 </select>
             </div>
-            <div style="grid-column: 1;">
+            <div>
                 <label for="first-visit" class="form-label">First Visit?</label>
                 <select id="first-visit" name="first-visit" class="form-control form-control-lg" required>
                     <option value="" disabled selected>&nbsp;</option>
@@ -385,7 +385,7 @@
         const zoomLevels = [1, 1.25, 1.5, 1.75];
 
         zoomLevels.forEach(level => {
-            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1 ? 'active' : ''}">${level}x</button>`);
+            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1.25 ? 'active' : ''}">${level}x</button>`);
             zoomButton.click(function() {
                 $('form').css('zoom', level);
                 zoomButtons.find('button').removeClass('active');
