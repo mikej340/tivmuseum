@@ -141,6 +141,27 @@
         form {
             display: none;
         }
+        .confirmation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        .confirmation-table td {
+            padding: 0.5rem 0;
+            border: none;
+        }
+        .confirmation-table td:first-child {
+            text-align: left;
+        }
+        .confirmation-table td:last-child {
+            text-align: right;
+        }
+        .confirmation-table tr.total td {
+            padding-top: 1rem;
+            border-top: 2px solid #dee2e6;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -204,6 +225,27 @@
         <input type="text" id="postcodeInput" class="form-control form-control-lg mb-3" style="text-transform: uppercase;">
         <div class="d-grid">
             <button type="button" class="btn btn-primary btn-lg" id="donePostcode">Save</button>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Please check admissions and ensure total matches the till before submitting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="confirmation-table">
+                        <tbody id="confirmationTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back to Edit</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmit">Submit</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>
@@ -530,13 +572,48 @@
     }
 
     function initializeFormSubmission() {
-        $('form').submit(function(event) {
+        const confirmationModal = new bootstrap.Modal($('#confirmationModal')[0]);
+        const form = $('form');
+
+        form.submit(function(event) {
             event.preventDefault();
 
-            const submitButton = $(this).find('button[type="submit"]');
+            const ticketDetails = visitorTypes.map(type => {
+                const count = parseInt($(`#${type.id}`).val()) || 0;
+                return { label: type.label, count, price: type.price, subtotal: count * type.price };
+            }).filter(detail => detail.count > 0);
+
+            const total = ticketDetails.reduce((sum, detail) => sum + detail.subtotal, 0);
+
+            // Build confirmation table
+            const tableBody = $('#confirmationTableBody');
+            tableBody.empty();
+            
+            ticketDetails.forEach(detail => {
+                const row = $('<tr></tr>');
+                row.append(`<td>${detail.label}</td>`);
+                row.append(`<td style="text-align: right; padding-right: 1rem;">${detail.count} × £${detail.price.toFixed(2)}</td>`);
+                row.append(`<td style="text-align: right;">£${detail.subtotal.toFixed(2)}</td>`);
+                tableBody.append(row);
+            });
+
+            // Add total row
+            const totalRow = $('<tr class="total"></tr>');
+            totalRow.append('<td colspan="2">Total</td>');
+            totalRow.append(`<td style="text-align: right;">£${total.toFixed(2)}</td>`);
+            tableBody.append(totalRow);
+        
+            // Show modal using Bootstrap API
+            confirmationModal.show();
+        });
+
+        $('#confirmSubmit').click(function() {
+            confirmationModal.hide();
+
+            const submitButton = form.find('button[type="submit"]');
             submitButton.prop('disabled', true).text('Processing...');
 
-            const formData = new FormData(this);
+            const formData = new FormData(form[0]);
             formData.append('timestamp', new Date().toISOString());
             formData.append('price', calculateTotalPrice().toFixed(2));
             formData.append('donation', calculateTotalDonations().toFixed(2)); // Add donations
