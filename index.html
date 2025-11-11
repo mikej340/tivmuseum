@@ -191,7 +191,7 @@
             <button type="reset" class="btn btn-lg btn-secondary">Reset</button>
         </div>
     </form>
-    <div class="modal fade" id="postcodeModal" tabindex="-1" aria-labelledby="postcodeModalLabel" aria-hidden="true">
+    <div class="modal" id="postcodeModal" tabindex="-1" aria-labelledby="postcodeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -199,7 +199,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="postcodeInput" class="form-control form-control-lg mb-3" style="text-transform: uppercase;">
+                    <input type="text" id="postcodeInput" class="form-control form-control-lg mb-3" style="text-transform: uppercase;" autofocus>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary btn-lg" id="donePostcode">Save</button>
@@ -208,7 +208,7 @@
         </div>
     </div>
 
-    <div id="confirmationModal" class="modal fade" tabindex="-1">
+    <div id="confirmationModal" class="modal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -639,10 +639,10 @@
     }
 
     function initializePostcodeModal() {
-        const modal = new bootstrap.Modal($('#postcodeModal')[0]);
+        const modalElement = $('#postcodeModal');
+        const modal = new bootstrap.Modal(modalElement[0]);
         const input = $('#postcode');
         const modalInput = $('#postcodeInput');
-        const modalElement = $('#postcodeModal')[0];
 
         function saveAndHide() {
             const value = modalInput.val().trim();
@@ -651,14 +651,12 @@
         }
 
         function showModal() {
-            modal.show();
             modalInput.val(input.val());
+            modal.show();
         }
 
-        // Listen to Bootstrap's shown event to select text
-        modalElement.addEventListener('shown.bs.modal', function() {
-            modalInput.focus();
-            modalInput[0].select();
+        modalElement.on('shown.bs.modal', function () {
+            modalInput.select();
         });
 
         input.on('focus', showModal);
