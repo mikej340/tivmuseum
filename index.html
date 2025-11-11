@@ -92,33 +92,6 @@
         .no .btn {
             font-family: monospace;
         }
-        .postcode-modal {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 1rem;
-            border-top: 1px solid #dee2e6;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 1050;
-            transform: translateY(100%);
-            transition: transform 0.3s ease-out;
-            will-change: transform;
-        }
-        .postcode-modal.show {
-            transform: translateY(0);
-        }
-        .postcode-modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1040;
-            display: none;
-        }
         #loadingOverlay {
             position: fixed;
             top: 0;
@@ -218,14 +191,20 @@
             <button type="reset" class="btn btn-lg btn-secondary">Reset</button>
         </div>
     </form>
-    <div class="postcode-modal-backdrop"></div>
-    <div class="postcode-modal">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Enter Postcode/Country</h5>
-        </div>
-        <input type="text" id="postcodeInput" class="form-control form-control-lg mb-3" style="text-transform: uppercase;">
-        <div class="d-grid">
-            <button type="button" class="btn btn-primary btn-lg" id="donePostcode">Save</button>
+    <div class="modal fade" id="postcodeModal" tabindex="-1" aria-labelledby="postcodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postcodeModalLabel">Enter Postcode/Country</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="postcodeInput" class="form-control form-control-lg mb-3" style="text-transform: uppercase;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-lg" id="donePostcode">Save</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -660,23 +639,27 @@
     }
 
     function initializePostcodeModal() {
-        const modal = $('.postcode-modal');
-        const backdrop = $('.postcode-modal-backdrop');
+        const modal = new bootstrap.Modal($('#postcodeModal')[0]);
         const input = $('#postcode');
         const modalInput = $('#postcodeInput');
+        const modalElement = $('#postcodeModal')[0];
 
         function saveAndHide() {
             const value = modalInput.val().trim();
             input.val(value).trigger('change');
-            backdrop.fadeOut();
-            modal.removeClass('show');
+            modal.hide();
         }
 
         function showModal() {
-            backdrop.fadeIn();
-            modal.addClass('show');
-            modalInput.val(input.val()).focus();
+            modal.show();
+            modalInput.val(input.val());
         }
+
+        // Listen to Bootstrap's shown event to select text
+        modalElement.addEventListener('shown.bs.modal', function() {
+            modalInput.focus();
+            modalInput[0].select();
+        });
 
         input.on('focus', showModal);
         $('#donePostcode').on('click', saveAndHide);
