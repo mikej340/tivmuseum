@@ -179,7 +179,7 @@
             </div>
             <div style="grid-column: span 2;">
                 <label for="hear-about-us" class="form-label">How did you hear about us?</label>
-                <select id="hear-about-us" name="hear-about-us" class="form-control form-control-lg" disabled required>
+                <select id="hear-about-us" name="hear-about-us" class="form-control form-control-lg" required>
                 </select>
                 <input type="text" id="other-hear-about-us" name="other-hear-about-us" class="form-control form-control-lg" style="display: none;" placeholder="Please specify" disabled required>
             </div>
@@ -479,13 +479,9 @@
         }
 
         function updateFormDependencies() {
-            const firstVisit = $('#first-visit').val();
             const hearAboutUs = $('#hear-about-us');
             const otherHearAboutUs = $('#other-hear-about-us');
 
-            // First Visit -> How did you hear about us
-            hearAboutUs.prop('disabled', firstVisit !== 'yes');
-            
             // How did you hear about us -> Other specification
             if (hearAboutUs.val() === formState.heardAboutUsOther) {
                 otherHearAboutUs.show().prop('disabled', false);
@@ -497,7 +493,7 @@
 
         // Attach event listeners
         $('input, textarea, select').on('input change', updateFieldFilledState);
-        $('#first-visit, #hear-about-us').on('change', updateFormDependencies);
+        $('#hear-about-us').on('change', updateFormDependencies);
         
         // Handle form reset
         $('form').on('reset', function() {
