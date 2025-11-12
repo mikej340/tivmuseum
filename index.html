@@ -220,6 +220,14 @@
                         <tbody id="confirmationTableBody">
                         </tbody>
                     </table>
+                    <div id="giftAidSection" style="display: none; margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #dee2e6;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="giftAidConfirm" name="gift-aid-form-completed" required>
+                            <label class="form-check-label" for="giftAidConfirm">
+                                Visitors have completed the gift aid form
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back to Edit</button>
@@ -471,6 +479,9 @@
     
     function initializeFormStateManagement() {
         function updateFieldFilledState() {
+            if ($(this).is('input[type="checkbox"]')) {
+                return; // Skip checkboxes
+            }
             if ($(this).is('input[type="number"]') && $(this).val() > 0 || !$(this).is('input[type="number"]') && $(this).val()) {
                 $(this).addClass('filled');
             } else {
@@ -579,11 +590,21 @@
             totalRow.append(`<td style="text-align: right;">£${total.toFixed(2)}</td>`);
             tableBody.append(totalRow);
         
+            // Show/hide gift aid section based on whether there are any donations
+            const hasGiftAid = calculateTotalDonations() > 0;
+            $('#giftAidSection').toggle(hasGiftAid);
+            
             // Show modal using Bootstrap API
             confirmationModal.show();
         });
 
         $('#confirmSubmit').click(function() {
+            // If Gift Aid section is shown, require the confirmation checkbox
+            if ($('#giftAidSection').is(':visible') && !$('#giftAidConfirm').is(':checked')) {
+                alert('Please confirm that visitors have completed the Gift Aid form.');
+                return;
+            }
+
             confirmationModal.hide();
 
             const submitButton = form.find('button[type="submit"]');
@@ -616,6 +637,7 @@
                     case 'Success':
                         showAlert('✓ Visit Recorded', 5000);
                         $('form').trigger('reset');
+                        $('#giftAidConfirm').prop('checked', false);
                         break;
                     case 'Unauthorized':
                         alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
