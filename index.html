@@ -136,6 +136,65 @@
             font-weight: bold;
             font-size: 1.1rem;
         }
+        .gift-aid-section {
+            display: none;
+            margin-top: 2rem;
+        }
+        .gift-aid-callout {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            border: 1px solid #dde8f0;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .gift-aid-callout.warning {
+            border-color: #e63946;
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.18);
+            transform: translateY(-2px);
+        }
+        .gift-aid-callout .form-check {
+            margin-bottom: 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .gift-aid-callout .form-check-input {
+            margin-top: 0.15rem;
+        }
+        #giftAidConfirm {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #5a8ed4;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #giftAidConfirm:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(90, 142, 212, 0.35);
+        }
+        .gift-aid-label {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #0f172a;
+            margin: 0;
+        }
+        .gift-aid-note {
+            font-size: 0.95rem;
+            color: #4f5663;
+            line-height: 1.4;
+            margin: 0;
+        }
+        .gift-aid-warning-text {
+            font-size: 0.9rem;
+            color: #ba1a1a;
+            margin: 0;
+            display: none;
+        }
+        .gift-aid-callout.warning .gift-aid-warning-text {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -212,20 +271,27 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Please check admissions and ensure total matches the till before submitting</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm tickets and total price matches till before submitting</h5>
                 </div>
                 <div class="modal-body">
                     <table class="confirmation-table">
                         <tbody id="confirmationTableBody">
                         </tbody>
                     </table>
-                    <div id="giftAidSection" style="display: none; margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #dee2e6;">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="giftAidConfirm" name="gift-aid-form-completed" required>
-                            <label class="form-check-label" for="giftAidConfirm">
-                                Visitors have completed the gift aid form
-                            </label>
+                    <div id="giftAidSection" class="gift-aid-section">
+                        <div class="gift-aid-callout">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="giftAidConfirm" name="gift-aid-form-completed" required>
+                                <label class="form-check-label gift-aid-label" for="giftAidConfirm">
+                                    Visitors have completed the Gift Aid form
+                                </label>
+                            </div>
+                            <p class="gift-aid-note">
+                                Gift Aid form must be completed by visitors, including the total amount.
+                            </p>
+                            <p class="gift-aid-warning-text" aria-live="assertive">
+                                Please tick this box once the Gift Aid form is completed.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -646,18 +712,36 @@
             // Show/hide gift aid section based on whether there are any donations
             const hasGiftAid = calculateTotalDonations() > 0;
             $('#giftAidSection').toggle(hasGiftAid);
+            if (!hasGiftAid) {
+                clearGiftAidWarning();
+            }
             
             // Show modal using Bootstrap API
             confirmationModal.show();
         });
 
+        const giftAidCallout = $('.gift-aid-callout');
+        const giftAidCheckbox = $('#giftAidConfirm');
+
+        function showGiftAidWarning() {
+            giftAidCallout.addClass('warning');
+            giftAidCheckbox.focus();
+        }
+
+        function clearGiftAidWarning() {
+            giftAidCallout.removeClass('warning');
+        }
+
+        giftAidCheckbox.change(clearGiftAidWarning);
+
         $('#confirmSubmit').click(function() {
             // If Gift Aid section is shown, require the confirmation checkbox
             if ($('#giftAidSection').is(':visible') && !$('#giftAidConfirm').is(':checked')) {
-                alert('Please confirm that visitors have completed the Gift Aid form.');
+                showGiftAidWarning();
                 return;
             }
 
+            clearGiftAidWarning();
             confirmationModal.hide();
 
             const submitButton = form.find('button[type="submit"]');
