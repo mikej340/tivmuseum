@@ -302,6 +302,19 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-body d-flex flex-column align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fs-3 text-success" aria-hidden="true">✓</span>
+                        <p class="fs-5 mb-0" id="successModalLabel">Visit Recorded</p>
+                    </div>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>
@@ -679,6 +692,7 @@
 
     function initializeFormSubmission() {
         const confirmationModal = new bootstrap.Modal($('#confirmationModal')[0]);
+        const successModal = new bootstrap.Modal($('#successModal')[0]);
         const form = $('form');
 
         form.submit(function(event) {
@@ -772,7 +786,7 @@
                 const res = await response.text();
                 switch (res) {
                     case 'Success':
-                        showAlert('✓ Visit Recorded', 5000);
+                        successModal.show();
                         $('form').trigger('reset');
                         $('#giftAidConfirm').prop('checked', false);
                         break;
