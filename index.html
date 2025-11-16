@@ -41,7 +41,7 @@
             margin: 1.5em 0;
         }
         .grid-container.visitor-counts {
-            grid-template-columns: repeat(auto-fit, minmax(133px, 150px));
+            grid-template-columns: repeat(auto-fit, minmax(133px, 175px));
             grid-auto-rows: minmax(70px, auto);
             justify-content: space-evenly;
         }
@@ -113,7 +113,7 @@
         }
         form {
             display: none;
-            zoom: 1.25;
+            font-size: 1.25rem;
         }
         .confirmation-table {
             width: 100%;
@@ -151,7 +151,7 @@
         <div class="no">
             <label for="" class="form-label"></label>
             <div class="input-group input-group-lg">
-                <input type="number" readonly id="" name="" min="0" value="0" step="1" class="form-control visitor-count">
+                <input type="number" readonly id="" name="" min="0" value="0" step="1" class="form-control form-control-lg fs-3 visitor-count">
             </div>
         </div>
     </template>
@@ -464,8 +464,11 @@
         const zoomButtons = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom buttons"></div>');
         const zoomLevels = [1, 1.25, 1.5, 1.75];
 
+        // Ensure base zoom is 1 so 1x = default size
+        $('form').css('zoom', 1);
+
         zoomLevels.forEach(level => {
-            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1.25 ? 'active' : ''}">${level}x</button>`);
+            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1 ? 'active' : ''}">${level}x</button>`);
             zoomButton.click(function() {
                 $('form').css('zoom', level);
                 zoomButtons.find('button').removeClass('active');
@@ -509,8 +512,8 @@
 
         numberInputs.each(function() {
             const numberInput = $(this);
-            const minusButton = $('<button type="button" class="btn btn-outline-secondary">-</button>');
-            const plusButton = $('<button type="button" class="btn btn-outline-secondary">+</button>');
+            const minusButton = $('<button type="button" class="btn btn-outline-secondary btn-lg fs-3">-</button>');
+            const plusButton = $('<button type="button" class="btn btn-outline-secondary btn-lg fs-3">+</button>');
 
             numberInput.before(minusButton);
             numberInput.after(plusButton);
