@@ -4,7 +4,7 @@
 // This works because text/plain responses are considered "simple" by browsers
 // and don't trigger preflight requests, unlike application/json
 
-const authToken = 'OkfnEVNjML'; // Change secret key as needed (TODO: move to separate file and don't commit to repo)
+const authToken = 'AUTHTOKEN'; // Change secret key as needed (TODO: move to separate file and don't commit to repo)
 
 // Get
 function doGet(e) {

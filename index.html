@@ -37,11 +37,11 @@
         }
         .grid-container {
             display: grid;
-            gap: 2rem;
-            margin: 2em 0;
+            gap: 1.5rem;
+            margin: 1.5em 0;
         }
         .grid-container.visitor-counts {
-            grid-template-columns: repeat(auto-fit, minmax(133px, 150px));
+            grid-template-columns: repeat(auto-fit, minmax(133px, 175px));
             grid-auto-rows: minmax(70px, auto);
             justify-content: space-evenly;
         }
@@ -113,7 +113,7 @@
         }
         form {
             display: none;
-            zoom: 1.25;
+            font-size: 1.25rem;
         }
         .confirmation-table {
             width: 100%;
@@ -136,6 +136,65 @@
             font-weight: bold;
             font-size: 1.1rem;
         }
+        .gift-aid-section {
+            display: none;
+            margin-top: 2rem;
+        }
+        .gift-aid-callout {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            border: 1px solid #dde8f0;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .gift-aid-callout.warning {
+            border-color: #e63946;
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.18);
+            transform: translateY(-2px);
+        }
+        .gift-aid-callout .form-check {
+            margin-bottom: 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .gift-aid-callout .form-check-input {
+            margin-top: 0.15rem;
+        }
+        #giftAidConfirm {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #5a8ed4;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #giftAidConfirm:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(90, 142, 212, 0.35);
+        }
+        .gift-aid-label {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #0f172a;
+            margin: 0;
+        }
+        .gift-aid-note {
+            font-size: 0.95rem;
+            color: #4f5663;
+            line-height: 1.4;
+            margin: 0;
+        }
+        .gift-aid-warning-text {
+            font-size: 0.9rem;
+            color: #ba1a1a;
+            margin: 0;
+            display: none;
+        }
+        .gift-aid-callout.warning .gift-aid-warning-text {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -151,7 +210,7 @@
         <div class="no">
             <label for="" class="form-label"></label>
             <div class="input-group input-group-lg">
-                <input type="number" readonly id="" name="" min="0" value="0" step="1" class="form-control visitor-count">
+                <input type="number" readonly id="" name="" min="0" value="0" step="1" class="form-control form-control-lg fs-3 visitor-count">
             </div>
         </div>
     </template>
@@ -212,26 +271,46 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Please check admissions and ensure total matches the till before submitting</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm tickets and total price matches till before submitting</h5>
                 </div>
                 <div class="modal-body">
                     <table class="confirmation-table">
                         <tbody id="confirmationTableBody">
                         </tbody>
                     </table>
-                    <div id="giftAidSection" style="display: none; margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #dee2e6;">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="giftAidConfirm" name="gift-aid-form-completed" required>
-                            <label class="form-check-label" for="giftAidConfirm">
-                                Visitors have completed the gift aid form
-                            </label>
+                    <div id="giftAidSection" class="gift-aid-section">
+                        <div class="gift-aid-callout">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="giftAidConfirm" name="gift-aid-form-completed" required>
+                                <label class="form-check-label gift-aid-label" for="giftAidConfirm">
+                                    Visitors have completed the Gift Aid form
+                                </label>
+                            </div>
+                            <p class="gift-aid-note">
+                                Gift Aid form must be completed by visitors, including the total amount.
+                            </p>
+                            <p class="gift-aid-warning-text" aria-live="assertive">
+                                Please tick this box once the Gift Aid form is completed.
+                            </p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back to Edit</button>
                     <button type="button" class="btn btn-primary" id="confirmSubmit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-body d-flex flex-column align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fs-3 text-success" aria-hidden="true">✓</span>
+                        <p class="fs-5 mb-0" id="successModalLabel">Visit Recorded</p>
+                    </div>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -327,7 +406,7 @@
 
     async function verifyToken(token) {
         if (!token) {
-            return false;
+            return { valid: false, unauthorized: false, error: 'No token provided' };
         }
         try {
             const response = await fetch(`${appsScriptUrl}?action=checkCredentials&authToken=${token}`, {
@@ -336,9 +415,14 @@
                     "Content-Type": "text/plain;charset=utf-8"
                 }
             });
-            return await response.text() !== 'Unauthorized';
-        } catch {
-            return false;
+            const text = await response.text();
+            if (text === 'Unauthorized') {
+                return { valid: false, unauthorized: true };
+            }
+            return { valid: true, unauthorized: false };
+        } catch (error) {
+            console.error('Error verifying token:', error);
+            return { valid: false, unauthorized: false, error: error?.message || 'Network error' };
         }
     }
 
@@ -352,54 +436,99 @@
         return token;
     }
 
-    function authenticate(clearExisting = false) {
+    function authenticate(clearExisting = false, updateStatus = () => {}) {
         if (clearExisting) {
             localStorage.removeItem('authToken');
         }
 
-        return new Promise(async (resolve, reject) => {
-            async function checkAndSetToken(token) {
-                if (await verifyToken(token)) {
-                    localStorage.setItem('authToken', token);
-                    return true;
+        const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+        const MAX_RETRIES = 3;
+
+        async function verifyWithRetry(token, contextMessage) {
+            let attempt = 0;
+            let lastError = '';
+            while (attempt < MAX_RETRIES) {
+                const verification = await verifyToken(token);
+                if (verification.valid || verification.unauthorized) {
+                    return verification;
                 }
-                localStorage.removeItem('authToken'); // Clear invalid token
-                return false;
+                lastError = verification.error || 'Unknown error';
+                attempt++;
+                updateStatus(`${contextMessage} (${lastError}) - retrying (${attempt}/${MAX_RETRIES})...`);
+                if (attempt < MAX_RETRIES) {
+                    await wait(2000);
+                }
+            }
+            const message = `${contextMessage} failed after ${MAX_RETRIES} attempts${lastError ? `: ${lastError}` : ''}`;
+            updateStatus(message);
+            return { valid: false, unauthorized: false, error: message };
+        }
+
+        return new Promise(async (resolve, reject) => {
+            async function checkAndSetToken(token, contextMessage) {
+                const verification = await verifyWithRetry(token, contextMessage);
+                if (verification.valid) {
+                    localStorage.setItem('authToken', token);
+                    return verification;
+                }
+                if (verification.unauthorized) {
+                    localStorage.removeItem('authToken'); // Clear only unauthorized token
+                    return verification;
+                }
+                throw new Error(verification.error || 'Unable to verify token');
             }
 
-            // Initial message
             let msg = 'Please enter the secret token:';
 
-            // First check URL parameter
             const urlToken = getAuthTokenFromUrl();
             if (urlToken) {
-                if (await checkAndSetToken(urlToken)) {
-                    resolve();
+                try {
+                    const result = await checkAndSetToken(urlToken, 'Verifying token from the URL');
+                    if (result.valid) {
+                        resolve();
+                        return;
+                    }
+                    if (result.unauthorized) {
+                        msg = 'The token from the URL is incorrect. Please enter the secret token:';
+                    }
+                } catch (error) {
+                    reject(error);
                     return;
-                } else {
-                    msg = 'The token from the URL is incorrect. Please enter the secret token:';
                 }
             }
 
-            // Then check existing token
             const existingToken = localStorage.getItem('authToken');
             if (existingToken) {
-                if (await checkAndSetToken(existingToken)) {
-                    resolve();
+                try {
+                    const result = await checkAndSetToken(existingToken, 'Verifying existing token');
+                    if (result.valid) {
+                        resolve();
+                        return;
+                    }
+                    if (result.unauthorized) {
+                        msg = 'The existing token is incorrect. Please enter the secret token:';
+                    }
+                } catch (error) {
+                    reject(error);
                     return;
-                } else {
-                    msg = 'The existing token is incorrect. Please enter the secret token:';
                 }
             }
             
-            // Finally prompt for token
             while (true) {
                 const token = prompt(msg);
-                if (await checkAndSetToken(token)) {
-                    resolve();
+                try {
+                    const result = await checkAndSetToken(token, 'Verifying provided token');
+                    if (result.valid) {
+                        resolve();
+                        return;
+                    }
+                    if (result.unauthorized) {
+                        msg = 'The token is incorrect. Please try again.';
+                    }
+                } catch (error) {
+                    reject(error);
                     return;
                 }
-                msg = 'The token is incorrect. Please try again.';
             }
         });
     }
@@ -414,8 +543,11 @@
         const zoomButtons = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom buttons"></div>');
         const zoomLevels = [1, 1.25, 1.5, 1.75];
 
+        // Ensure base zoom is 1 so 1x = default size
+        $('form').css('zoom', 1);
+
         zoomLevels.forEach(level => {
-            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1.25 ? 'active' : ''}">${level}x</button>`);
+            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1 ? 'active' : ''}">${level}x</button>`);
             zoomButton.click(function() {
                 $('form').css('zoom', level);
                 zoomButtons.find('button').removeClass('active');
@@ -459,8 +591,8 @@
 
         numberInputs.each(function() {
             const numberInput = $(this);
-            const minusButton = $('<button type="button" class="btn btn-outline-secondary">-</button>');
-            const plusButton = $('<button type="button" class="btn btn-outline-secondary">+</button>');
+            const minusButton = $('<button type="button" class="btn btn-outline-secondary btn-lg fs-3">-</button>');
+            const plusButton = $('<button type="button" class="btn btn-outline-secondary btn-lg fs-3">+</button>');
 
             numberInput.before(minusButton);
             numberInput.after(plusButton);
@@ -560,6 +692,7 @@
 
     function initializeFormSubmission() {
         const confirmationModal = new bootstrap.Modal($('#confirmationModal')[0]);
+        const successModal = new bootstrap.Modal($('#successModal')[0]);
         const form = $('form');
 
         form.submit(function(event) {
@@ -593,18 +726,36 @@
             // Show/hide gift aid section based on whether there are any donations
             const hasGiftAid = calculateTotalDonations() > 0;
             $('#giftAidSection').toggle(hasGiftAid);
+            if (!hasGiftAid) {
+                clearGiftAidWarning();
+            }
             
             // Show modal using Bootstrap API
             confirmationModal.show();
         });
 
+        const giftAidCallout = $('.gift-aid-callout');
+        const giftAidCheckbox = $('#giftAidConfirm');
+
+        function showGiftAidWarning() {
+            giftAidCallout.addClass('warning');
+            giftAidCheckbox.focus();
+        }
+
+        function clearGiftAidWarning() {
+            giftAidCallout.removeClass('warning');
+        }
+
+        giftAidCheckbox.change(clearGiftAidWarning);
+
         $('#confirmSubmit').click(function() {
             // If Gift Aid section is shown, require the confirmation checkbox
             if ($('#giftAidSection').is(':visible') && !$('#giftAidConfirm').is(':checked')) {
-                alert('Please confirm that visitors have completed the Gift Aid form.');
+                showGiftAidWarning();
                 return;
             }
 
+            clearGiftAidWarning();
             confirmationModal.hide();
 
             const submitButton = form.find('button[type="submit"]');
@@ -635,7 +786,7 @@
                 const res = await response.text();
                 switch (res) {
                     case 'Success':
-                        showAlert('✓ Visit Recorded', 5000);
+                        successModal.show();
                         $('form').trigger('reset');
                         $('#giftAidConfirm').prop('checked', false);
                         break;
@@ -765,7 +916,7 @@
         }
         // Initialize everything in sequence
         updateLoadingStatus('Authenticating...');
-        authenticate()
+        authenticate(false, updateLoadingStatus)
             .then(() => {
                 updateLoadingStatus('Loading form options...');
                 return Promise.all([
