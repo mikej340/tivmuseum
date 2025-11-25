@@ -1,6 +1,5 @@
 ## High priority
 
-- Retry on fetch error (other than unauthorised)
 - On app script error return in response
 - Educate volunteers
   - How to get back to form if accidently close or switch tabs etc
