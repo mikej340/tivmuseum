@@ -1,9 +1,11 @@
 ## High priority
 
-- Educate volunteers - How to get back to form if accidently close or switch tabs etc
-- Postcode submit button still hidden behind keyboard (not now that it’s in kiosk mode)
-- Fix prices in spreadsheet for half price event
 - Retry on fetch error (other than unauthorised)
+- On app script error return in response
+- Educate volunteers
+  - How to get back to form if accidently close or switch tabs etc
+  - Full postcodes are being entered. Possibly use REGEX to try to detect
+- Fix prices in spreadsheet for half price event
 - After putting in auth key, keyboard can’t be dismissed easily
 - documentation
   - Adding new fields
@@ -35,6 +37,8 @@
 - link to GitHub, documentation, sheet
 - order of select items
 - Maybe don’t load form options unless changed… tho probably won’t take any less time…
+- Exclude daily totals from Zoom changes
+- Consider if modals zoom needs to be changed when Zoom changes
 
 
 ## Further consideration required

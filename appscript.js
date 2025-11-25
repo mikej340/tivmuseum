@@ -53,6 +53,11 @@ function doGet(e) {
       return ContentService.createTextOutput(JSON.stringify(heardData))
         .setMimeType(ContentService.MimeType.TEXT);
     
+    case 'getTodayTotals':
+      const todayTotals = getTotalsForDate(new Date());
+      return ContentService.createTextOutput(JSON.stringify(todayTotals || {}))
+        .setMimeType(ContentService.MimeType.TEXT);
+    
     default:
       return ContentService.createTextOutput('Invalid action')
         .setMimeType(ContentService.MimeType.TEXT);
@@ -81,9 +86,9 @@ function doPost(e) {
       } else {
         recordToAppend[heading] = data.record[heading];
       }
-    } else {
+    } else if (!heading.startsWith('#')) { // ignore computed columns
       recordToAppend[heading] = ''; // Add empty string if heading is not in record
-    } 
+    }
   }
 
   // ensure no entries in data.record are missing from the sheet
@@ -96,4 +101,68 @@ function doPost(e) {
   sheet.appendRow(Object.values(recordToAppend));
 
   return ContentService.createTextOutput('Success').setMimeType(ContentService.MimeType.TEXT);
+}
+
+function getTotalsForDate(targetDate) {
+  const ss = SpreadsheetApp.getActive();
+  const sheet = ss.getSheetByName('Visitors');  // source data
+  
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return null;
+
+  const header = values.shift();
+
+  // Adjust these names to match your actual headers
+  const dateColIndex      = header.indexOf('# Date');
+  const totalVisColIndex  = header.indexOf('# Total visitors');
+  const priceColIndex     = header.indexOf('price');
+  const donationColIndex  = header.indexOf('donation');
+
+  if (dateColIndex === -1 || totalVisColIndex === -1 ||
+      priceColIndex === -1 || donationColIndex === -1) {
+    throw new Error('Required columns not found.');
+  }
+
+  // Normalise target date
+  const t = new Date(targetDate);
+  t.setHours(0,0,0,0);
+
+  let totalVisitors = 0;
+  let totalPrice = 0;
+  let totalDonation = 0;
+
+  for (const row of values) {
+    const rd = row[dateColIndex];
+    rd.setHours(0,0,0,0);
+
+    if (rd.getTime() === t.getTime()) {
+      totalVisitors += Number(row[totalVisColIndex]) || 0;
+      totalPrice    += Number(row[priceColIndex])    || 0;
+      totalDonation += Number(row[donationColIndex]) || 0;
+    }
+  }
+
+  return {
+    date: t,
+    totalVisitors,
+    totalPrice,
+    totalDonation
+  };
+}
+
+
+/**
+ * Manual test helper: simulates an HTTP GET to fetch today's totals.
+ * Check the execution logs for the returned body.
+ */
+function testGetTodayTotals() {
+  const fakeEvent = {
+    parameter: {
+      authToken: authToken,
+      action: 'getTodayTotals'
+    }
+  };
+  const result = doGet(fakeEvent);
+  const body = result.getContent ? result.getContent() : result.getResponseText();
+  Logger.log(body);
 }

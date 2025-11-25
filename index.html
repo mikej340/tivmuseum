@@ -14,7 +14,7 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 3em 1em 3em 1em;
+            padding: 0 1em;
             height: 100vh;
         }
         .zoom-controls {
@@ -195,6 +195,24 @@
         .gift-aid-callout.warning .gift-aid-warning-text {
             display: block;
         }
+        .today-totals {
+            display: none;
+            justify-content: center;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .today-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            letter-spacing: 0.005em;
+        }
     </style>
 </head>
 <body>
@@ -204,7 +222,9 @@
         </div>
         <div id="loadingStatus" class="loading-status">Initializing...</div>
     </div>
-    <div id="alertMessage" class="alert-float alert alert-success"></div>
+    <div class="today-totals" id="todayTotalsContainer" aria-live="polite">
+        <div class="today-pill" id="todayTotalsPill">Loading today totals...</div>
+    </div>
     <!-- Template for visitor count inputs -->
     <template id="visitor-count-template">
         <div class="no">
@@ -329,7 +349,7 @@
         };
     }
 
-    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw1C2JmAVNmTamt-mFVW3OIE98qHKRCZgWyFbq4PHx3xjBF-qlgZzB0Qa9MCTiZX4jCMQ/exec';
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxHcA7M1eB1RZ8WIXiEZGv57kT8No0-Np9HsjHBrCIJMgUc0yVRDeg2dIXXFutWXASRxw/exec';
 
     let visitorTypes = []; // This will be populated dynamically
 
@@ -339,6 +359,55 @@
         heardAboutUsOther: 'Other - please specify', // Must match spreadsheet ID
         childTypeId: 'child' // Must match spreadsheet ID
     };
+    const todayTotalsDefaults = { totalVisitors: 0, totalPrice: 0, totalDonation: 0 };
+
+    function renderTodayTotals(totals, options = {}) {
+        const pill = $('#todayTotalsPill');
+        if (options.loading) {
+            pill.text('Loading today totals...');
+        } else if (!totals || options.error) {
+            pill.text('Today totals unavailable');
+        } else {
+            const visitorLabel = totals.totalVisitors === 1 ? 'visitor' : 'visitors';
+            const donationPart = totals.totalDonation > 0 ? ` · donations £${Number(totals.totalDonation).toFixed(2)}` : '';
+            pill.text(`Today: ${totals.totalVisitors} ${visitorLabel} · £${Number(totals.totalPrice).toFixed(2)}${donationPart}`);
+        }
+        $('#todayTotalsContainer').css('display', 'flex');
+    }
+
+    function fetchTodayTotals(options = {}) {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            renderTodayTotals(todayTotalsDefaults, { error: true });
+            return Promise.resolve();
+        }
+
+        if (!options.quiet) {
+            renderTodayTotals(todayTotalsDefaults, { loading: true });
+        }
+
+        return fetch(`${appsScriptUrl}?action=getTodayTotals&authToken=${token}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network error');
+                }
+                return response.text();
+            })
+            .then(text => {
+                if (text === 'Unauthorized') {
+                    throw new Error('Unauthorized');
+                }
+                const data = JSON.parse(text);
+                renderTodayTotals(data || todayTotalsDefaults);
+            })
+            .catch(error => {
+                console.error('Failed to fetch today totals:', error);
+                renderTodayTotals(todayTotalsDefaults, { error: true });
+                if (!options.quiet) {
+                    showAlert('Unable to load today totals right now');
+                }
+            });
+    }
 
     function calculateTotalPrice() {
         let totalPrice = 0;
@@ -786,6 +855,7 @@
                 const res = await response.text();
                 switch (res) {
                     case 'Success':
+                        fetchTodayTotals({ quiet: true });
                         successModal.show();
                         $('form').trigger('reset');
                         $('#giftAidConfirm').prop('checked', false);
@@ -935,6 +1005,7 @@
                 initializePostcodeModal();
                 initializeFormStateManagement();
                 updateFormSummaryAndVisibility();
+                fetchTodayTotals();
                 
                 // Show form and hide loading overlay
                 $('#loadingOverlay').fadeOut();
