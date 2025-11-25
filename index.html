@@ -360,6 +360,52 @@
         childTypeId: 'child' // Must match spreadsheet ID
     };
     const todayTotalsDefaults = { totalVisitors: 0, totalPrice: 0, totalDonation: 0 };
+    const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    /**
+     * Fetch wrapper with configurable retries/backoff.
+     * Can replace most fetch calls: fetchWithRetry(url, options, retryOptions)
+     */
+    function fetchWithRetry(url, options = {}, retryOptions = {}) {
+        const {
+            retries = 3,
+            retryDelay = 500,
+            backoffFactor = 2,
+            retryOn = (response, error) => {
+                if (error) return true; // network/connection errors
+                if (!response) return false;
+                const { status } = response;
+                return status === 429 || status >= 500;
+            }
+        } = retryOptions;
+
+        let attempt = 0;
+        let delay = retryDelay;
+
+        const attemptRequest = () => {
+            return fetch(url, options)
+                .then(response => {
+                    if (!retryOn(response, null, attempt) || attempt >= retries) {
+                        return response;
+                    }
+                    const currentDelay = delay;
+                    attempt++;
+                    delay *= backoffFactor;
+                    return wait(currentDelay).then(attemptRequest);
+                })
+                .catch(error => {
+                    if (!retryOn(null, error, attempt) || attempt >= retries) {
+                        throw error;
+                    }
+                    const currentDelay = delay;
+                    attempt++;
+                    delay *= backoffFactor;
+                    return wait(currentDelay).then(attemptRequest);
+                });
+        };
+
+        return attemptRequest();
+    }
 
     function renderTodayTotals(totals, options = {}) {
         const pill = $('#todayTotalsPill');
@@ -386,10 +432,10 @@
             renderTodayTotals(todayTotalsDefaults, { loading: true });
         }
 
-        return fetch(`${appsScriptUrl}?action=getTodayTotals&authToken=${token}`)
+        return fetchWithRetry(`${appsScriptUrl}?action=getTodayTotals&authToken=${token}`)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network error');
+                    throw new Error(`Request failed (${response.status})`);
                 }
                 return response.text();
             })
@@ -478,7 +524,7 @@
             return { valid: false, unauthorized: false, error: 'No token provided' };
         }
         try {
-            const response = await fetch(`${appsScriptUrl}?action=checkCredentials&authToken=${token}`, {
+            const response = await fetchWithRetry(`${appsScriptUrl}?action=checkCredentials&authToken=${token}`, {
                 method: 'GET',
                 headers: {
                     "Content-Type": "text/plain;charset=utf-8"
@@ -510,7 +556,6 @@
             localStorage.removeItem('authToken');
         }
 
-        const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
         const MAX_RETRIES = 3;
 
         async function verifyWithRetry(token, contextMessage) {
@@ -914,7 +959,7 @@
     }
 
     function initializeVisitorTypes() {
-        return fetch(`${appsScriptUrl}?action=getVisitorTypes&authToken=${localStorage.getItem('authToken')}`)
+        return fetchWithRetry(`${appsScriptUrl}?action=getVisitorTypes&authToken=${localStorage.getItem('authToken')}`)
             .then(response => response.text())
             .then(text => {
                 const data = JSON.parse(text);
@@ -934,7 +979,7 @@
     }
 
     function initializeReasonForVisit() {
-        return fetch(`${appsScriptUrl}?action=getReasonsForVisit&authToken=${localStorage.getItem('authToken')}`)
+        return fetchWithRetry(`${appsScriptUrl}?action=getReasonsForVisit&authToken=${localStorage.getItem('authToken')}`)
             .then(response => response.text())
             .then(text => {
                 const data = JSON.parse(text);
@@ -960,7 +1005,7 @@
     }
 
     function initializeHowHeardAboutUs() {
-        return fetch(`${appsScriptUrl}?action=getHeardAboutUs&authToken=${localStorage.getItem('authToken')}`)
+        return fetchWithRetry(`${appsScriptUrl}?action=getHeardAboutUs&authToken=${localStorage.getItem('authToken')}`)
             .then(response => response.text())
             .then(text => {
                 const data = JSON.parse(text);
