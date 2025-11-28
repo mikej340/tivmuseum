@@ -1,5 +1,6 @@
 ## High priority
 
+- running total wont update on new day until after first submission
 - On app script error return in response
 - Educate volunteers
   - How to get back to form if accidently close or switch tabs etc
