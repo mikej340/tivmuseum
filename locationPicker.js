@@ -157,7 +157,6 @@
   let mode = MODE_UK;
   let _resolve = null;
   let _isOpen = false;
-  let _rememberModeKey = null;
   let listenersBound = false;
   let isSetup = false;
 
@@ -232,17 +231,11 @@
   }
 
   function confirmUk(v) {
-    if (_rememberModeKey) {
-      try { localStorage.setItem(_rememberModeKey, MODE_UK); } catch {}
-    }
     closeModal();
     safeResolve({ type: 'uk', value: v });
   }
 
   function confirmCountry(v) {
-    if (_rememberModeKey) {
-      try { localStorage.setItem(_rememberModeKey, MODE_COUNTRY); } catch {}
-    }
     closeModal();
     safeResolve({ type: 'country', value: v });
   }
@@ -619,20 +612,13 @@
 
   async function open(options = {}) {
     await ensureSetup();
-    const { initial = null, rememberModeKey = null } = options || {};
+    const { initial = null } = options || {};
 
     if (_isOpen) cancel();
-
-    _rememberModeKey = rememberModeKey || null;
 
     let desiredMode = MODE_UK;
     if (initial && (initial.type === 'uk' || initial.type === 'country')) {
       desiredMode = initial.type === 'uk' ? MODE_UK : MODE_COUNTRY;
-    } else if (_rememberModeKey) {
-      try {
-        const remembered = localStorage.getItem(_rememberModeKey);
-        if (remembered === MODE_COUNTRY || remembered === MODE_UK) desiredMode = remembered;
-      } catch {}
     }
 
     resetUk();
@@ -656,13 +642,12 @@
         return;
       }
 
-      const rememberModeKey = options.rememberModeKey || 'locationPicker:lastMode';
       const onConfirm = typeof options.onConfirm === 'function' ? options.onConfirm : null;
       const getInitial = typeof options.getInitial === 'function' ? options.getInitial : deriveInitialFromValue;
 
       const handleOpen = async () => {
         const initial = getInitial(input.value);
-        const res = await open({ initial, rememberModeKey });
+        const res = await open({ initial });
         if (!res) return;
         input.value = res.value;
         input.dispatchEvent(new Event('change', { bubbles: true }));
