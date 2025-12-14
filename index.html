@@ -271,6 +271,22 @@
             <button type="reset" class="btn btn-lg btn-secondary">Reset</button>
         </div>
     </form>
+    <div class="modal" id="postcodeModal" tabindex="-1" aria-labelledby="postcodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postcodeModalLabel">Enter Postcode/Country</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="postcodeInput" class="form-control form-control-lg mb-3" style="text-transform: uppercase;" autofocus>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-lg" id="donePostcode">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="confirmationModal" class="modal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -345,6 +361,11 @@
     };
     const todayTotalsDefaults = { totalVisitors: 0, totalPrice: 0, totalDonation: 0 };
     const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const queryParams = new URLSearchParams(window.location.search);
+    const useLegacyPostcodeModal = (() => {
+        const flag = (queryParams.get('postcodeModal') || queryParams.get('oldPostcodeModal') || '').toLowerCase();
+        return ['1', 'true', 'yes', 'y', 'old', 'legacy', 'simple'].includes(flag);
+    })();
 
     /**
      * Fetch wrapper with configurable retries/backoff.
@@ -911,6 +932,48 @@
         });
     }
 
+    function initializeLegacyPostcodeModal() {
+        const modalElement = $('#postcodeModal');
+        const modal = new bootstrap.Modal(modalElement[0]);
+        const input = $('#postcode');
+        const modalInput = $('#postcodeInput');
+
+        input.removeAttr('readonly');
+        input.removeAttr('inputmode');
+        input.removeAttr('aria-haspopup');
+
+        function saveAndHide() {
+            const value = modalInput.val().trim();
+            input.val(value).trigger('change');
+            modal.hide();
+        }
+
+        function showModal() {
+            modalInput.val(input.val());
+            modal.show();
+        }
+
+        modalElement.on('shown.bs.modal', function () {
+            modalInput.trigger('focus');
+            modalInput.select();
+        });
+
+        input.on('focus', showModal);
+        input.on('click', showModal);
+        $('#donePostcode').on('click', saveAndHide);
+        
+        modalInput
+            .on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveAndHide();
+                }
+            })
+            .on('blur', function() {
+                saveAndHide();
+            });
+    }
+
     function initializeLocationPickerInput() {
         const input = document.getElementById('postcode');
         if (!input || !window.LocationPicker) {
@@ -927,6 +990,15 @@
             rememberModeKey: 'locationPicker:lastMode',
             onConfirm: () => $('#postcode').trigger('change')
         });
+    }
+
+    function initializePostcodeInput() {
+        if (useLegacyPostcodeModal) {
+            console.info('Using legacy postcode modal (query param override enabled).');
+            initializeLegacyPostcodeModal();
+            return;
+        }
+        initializeLocationPickerInput();
     }
 
     function initializeVisitorTypes() {
@@ -1018,7 +1090,7 @@
                 initializeFormValidation();
                 initializeResetConfirmation();
                 initializeFormSubmission();
-                initializeLocationPickerInput();
+                initializePostcodeInput();
                 initializeFormStateManagement();
                 updateFormSummaryAndVisibility();
                 fetchTodayTotals();
