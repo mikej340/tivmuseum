@@ -242,7 +242,7 @@
         <div class="grid-container other">
             <div style="grid-column: 1;">
                 <label for="postcode" class="form-label">Postcode/Country</label>
-                <input type="text" id="postcode" name="postcode" required style="text-transform: uppercase;" class="form-control form-control-lg">
+                <input type="text" id="postcode" name="postcode" required style="text-transform: uppercase;" class="form-control form-control-lg" readonly inputmode="none" aria-haspopup="dialog">
             </div>
             <div>
                 <label for="reason-for-visit" class="form-label">Reason for Visit</label>
@@ -915,6 +915,11 @@
         const input = document.getElementById('postcode');
         if (!input || !window.LocationPicker) {
             console.warn('LocationPicker unavailable; using plain postcode input');
+            if (input) {
+                input.removeAttribute('readonly');
+                input.removeAttribute('inputmode');
+                input.removeAttribute('aria-haspopup');
+            }
             return () => {};
         }
 
