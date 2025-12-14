@@ -363,8 +363,8 @@
     const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     const queryParams = new URLSearchParams(window.location.search);
     const useLegacyPostcodeModal = (() => {
-        const flag = (queryParams.get('postcodeModal') || queryParams.get('oldPostcodeModal') || '').toLowerCase();
-        return ['1', 'true', 'yes', 'y', 'old', 'legacy', 'simple'].includes(flag);
+        const postcodeModal = (queryParams.get('postcodeModal') || '').trim().toLowerCase();
+        return postcodeModal !== 'new';
     })();
 
     /**
@@ -993,7 +993,6 @@
 
     function initializePostcodeInput() {
         if (useLegacyPostcodeModal) {
-            console.info('Using legacy postcode modal (query param override enabled).');
             initializeLegacyPostcodeModal();
             return;
         }
