@@ -640,14 +640,19 @@
     function initializeZoomControls() {
         const zoomButtons = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom buttons"></div>');
         const zoomLevels = [1, 1.25, 1.5, 1.75];
+        const zoomTarget = $('body');
+
+        const applyZoom = (level) => {
+            zoomTarget.css('zoom', level);
+        };
 
         // Ensure base zoom is 1 so 1x = default size
-        $('form').css('zoom', 1);
+        applyZoom(1);
 
         zoomLevels.forEach(level => {
             const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1 ? 'active' : ''}">${level}x</button>`);
             zoomButton.click(function() {
-                $('form').css('zoom', level);
+                applyZoom(level);
                 zoomButtons.find('button').removeClass('active');
                 $(this).addClass('active');
             });
