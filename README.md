@@ -1,11 +1,9 @@
 ## High priority
 
+- Add museum repository and Google sheet
 - running total wont update on new day until after first submission
 - On app script error return in response
-- Educate volunteers
-  - How to get back to form if accidently close or switch tabs etc
-  - Full postcodes are being entered. Possibly use REGEX to try to detect
-- Fix prices in spreadsheet for half price event
+- How to Roll out new location picker?
 - After putting in auth key, keyboard can’t be dismissed easily
 - documentation
   - Adding new fields
@@ -24,7 +22,6 @@
   - end of day totals
   - Reconciliation. Even if Carrie gets from spreadsheet or something
   - Enter footfall figure? Low priority
-  - Add worksheet showing totals per day
   - Link (from menu?) to spreadsheet
     - Pippa can share login with Shirley/Carrie/anyone she trusts to make changes
   - review Pippa reports
@@ -37,8 +34,6 @@
 - link to GitHub, documentation, sheet
 - order of select items
 - Maybe don’t load form options unless changed… tho probably won’t take any less time…
-- Exclude daily totals from Zoom changes
-- Consider if modals zoom needs to be changed when Zoom changes
 
 
 ## Further consideration required
@@ -51,7 +46,6 @@
   - proper DB?
   - Need DB IDs?
 - Is Holiday Activities used for people on holiday? I thought it was for eg Halloween event
-- Christmas? E.g. Father Christmas is 8.50 for kids?
 - Dashboard / Kiosk dashboard
   - Consider turning app/page into a “Kiosk Dashboard” or some shit; visitor counter, common web links, current surveys, activities, newsletter, calendar, email Pippa, Carrie. 🤷
 - figure out how gonna manage submissions
