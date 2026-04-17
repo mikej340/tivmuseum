@@ -376,6 +376,7 @@
             retries = 3,
             retryDelay = 500,
             backoffFactor = 2,
+            timeout = 30000,
             retryOn = (response, error) => {
                 if (error) return true; // network/connection errors
                 if (!response) return false;
@@ -388,7 +389,10 @@
         let delay = retryDelay;
 
         const attemptRequest = () => {
-            return fetch(url, options)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            return fetch(url, { ...options, signal: controller.signal })
+                .finally(() => clearTimeout(timeoutId))
                 .then(response => {
                     if (!retryOn(response, null, attempt) || attempt >= retries) {
                         return response;
@@ -399,6 +403,9 @@
                     return wait(currentDelay).then(attemptRequest);
                 })
                 .catch(error => {
+                    if (error.name === 'AbortError') {
+                        error = new Error('Request timed out');
+                    }
                     if (!retryOn(null, error, attempt) || attempt >= retries) {
                         throw error;
                     }
@@ -535,6 +542,9 @@
                     "Content-Type": "text/plain;charset=utf-8"
                 }
             });
+            if (!response.ok) {
+                throw new Error(`Server error (${response.status})`);
+            }
             const text = await response.text();
             if (text === 'Unauthorized') {
                 return { valid: false, unauthorized: true };
@@ -544,16 +554,6 @@
             console.error('Error verifying token:', error);
             return { valid: false, unauthorized: false, error: error?.message || 'Network error' };
         }
-    }
-
-    function getAuthTokenFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('k');
-        if (token) {
-            // Remove token from URL without reloading
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-        return token;
     }
 
     function authenticate(clearExisting = false, updateStatus = () => {}) {
@@ -599,23 +599,6 @@
 
             let msg = 'Please enter the secret token:';
 
-            const urlToken = getAuthTokenFromUrl();
-            if (urlToken) {
-                try {
-                    const result = await checkAndSetToken(urlToken, 'Verifying token from the URL');
-                    if (result.valid) {
-                        resolve();
-                        return;
-                    }
-                    if (result.unauthorized) {
-                        msg = 'The token from the URL is incorrect. Please enter the secret token:';
-                    }
-                } catch (error) {
-                    reject(error);
-                    return;
-                }
-            }
-
             const existingToken = localStorage.getItem('authToken');
             if (existingToken) {
                 try {
@@ -628,11 +611,11 @@
                         msg = 'The existing token is incorrect. Please enter the secret token:';
                     }
                 } catch (error) {
-                    reject(error);
-                    return;
+                    // Connection error — token may still be valid; don't clear it, let user retry
+                    msg = 'Could not reach the server (connection error). Your saved token has not been cleared. Please try again:';
                 }
             }
-            
+
             while (true) {
                 const token = prompt(msg);
                 try {
@@ -645,8 +628,7 @@
                         msg = 'The token is incorrect. Please try again.';
                     }
                 } catch (error) {
-                    reject(error);
-                    return;
+                    msg = 'Could not reach the server (connection error). Please check your connection and try again:';
                 }
             }
         });
