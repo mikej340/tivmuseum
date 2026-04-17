@@ -72,6 +72,13 @@ function doPost(e) {
     return ContentService.createTextOutput('Unauthorized').setMimeType(ContentService.MimeType.TEXT);
   }
 
+  if (data.idempotencyKey) {
+    const props = PropertiesService.getScriptProperties();
+    if (props.getProperty('idem_' + data.idempotencyKey) !== null) {
+      return ContentService.createTextOutput('Success').setMimeType(ContentService.MimeType.TEXT);
+    }
+  }
+
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Visitors'); // Change sheet name as needed
   const headings = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
 
@@ -100,7 +107,23 @@ function doPost(e) {
 
   sheet.appendRow(Object.values(recordToAppend));
 
+  if (data.idempotencyKey) {
+    const props = PropertiesService.getScriptProperties();
+    props.setProperty('idem_' + data.idempotencyKey, new Date().toISOString());
+    pruneIdempotencyKeys(props);
+  }
+
   return ContentService.createTextOutput('Success').setMimeType(ContentService.MimeType.TEXT);
+}
+
+function pruneIdempotencyKeys(props) {
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  const allProps = props.getProperties();
+  for (const [key, value] of Object.entries(allProps)) {
+    if (key.startsWith('idem_') && new Date(value).getTime() < cutoff) {
+      props.deleteProperty(key);
+    }
+  }
 }
 
 function getTotalsForDate(targetDate) {

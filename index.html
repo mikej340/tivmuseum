@@ -801,9 +801,13 @@
         const confirmationModal = new bootstrap.Modal($('#confirmationModal')[0]);
         const successModal = new bootstrap.Modal($('#successModal')[0]);
         const form = $('form');
+        let currentSubmissionKey = null;
 
         form.submit(function(event) {
             event.preventDefault();
+            if (!currentSubmissionKey) {
+                currentSubmissionKey = crypto.randomUUID();
+            }
 
             const ticketDetails = visitorTypes.map(type => {
                 const count = parseInt($(`#${type.id}`).val()) || 0;
@@ -873,9 +877,10 @@
             formData.append('price', calculateTotalPrice().toFixed(2));
             formData.append('donation', calculateTotalDonations().toFixed(2)); // Add donations
 
-            const body = { 
-                record: Object.fromEntries(formData.entries()), 
-                authToken: localStorage.getItem('authToken')
+            const body = {
+                record: Object.fromEntries(formData.entries()),
+                authToken: localStorage.getItem('authToken'),
+                idempotencyKey: currentSubmissionKey
             };
 
             fetch(appsScriptUrl, {
@@ -897,6 +902,7 @@
                         successModal.show();
                         $('form').trigger('reset');
                         $('#giftAidConfirm').prop('checked', false);
+                        currentSubmissionKey = null;
                         break;
                     case 'Unauthorized':
                         alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
