@@ -267,6 +267,10 @@
         <div class="form-footer">
             <p id="members-only-message" style="display: none;">(No other fields required as only members visiting)</p>
             <p id="summary-message" class="text-muted mb-3"></p>
+            <div id="submissionLocked" class="alert alert-warning d-none" role="alert">
+                <p id="submissionStatus" class="mb-2">Submitting…</p>
+                <button type="button" id="retrySubmit" class="btn btn-warning d-none">Try again</button>
+            </div>
             <button type="submit" class="btn btn-lg btn-primary">Submit</button>
             <button type="reset" class="btn btn-lg btn-secondary">Reset</button>
         </div>
@@ -859,6 +863,75 @@
 
         giftAidCheckbox.change(clearGiftAidWarning);
 
+        const MAX_SUBMIT_ATTEMPTS = 10;
+
+        function lockForm() {
+            form.find(':input').prop('disabled', true);
+            form.find('button[type="submit"]').prop('disabled', true).text('Processing…');
+            $('#submissionLocked').removeClass('d-none');
+            $('#retrySubmit').addClass('d-none');
+        }
+
+        function unlockForm() {
+            form.find(':input').prop('disabled', false);
+            form.find('button[type="submit"]').prop('disabled', false).text('Submit');
+            $('#submissionLocked').addClass('d-none');
+        }
+
+        function setSubmissionStatus(msg) {
+            $('#submissionStatus').text(msg);
+        }
+
+        function submitRecord(record, attempt) {
+            setSubmissionStatus('Attempt ' + attempt + ' of ' + MAX_SUBMIT_ATTEMPTS +
+                                ' — ' + (attempt === 1 ? 'submitting…' : 'retrying…'));
+
+            fetch(appsScriptUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    record,
+                    authToken: localStorage.getItem('authToken'),
+                    idempotencyKey: currentSubmissionKey
+                })
+            })
+            .then(async response => {
+                if (!response.ok) throw new Error('http');
+                return response.text();
+            })
+            .then(res => {
+                if (res === 'Success') {
+                    unlockForm();
+                    fetchTodayTotals({ quiet: true });
+                    successModal.show();
+                    $('form').trigger('reset');
+                    $('#giftAidConfirm').prop('checked', false);
+                    currentSubmissionKey = null;
+                } else if (res === 'Unauthorized') {
+                    setSubmissionStatus('Token rejected — please enter the correct token in the prompt.');
+                    authenticate(true).then(() => submitRecord(record, 1));
+                } else {
+                    scheduleRetry(record, attempt);
+                }
+            })
+            .catch(() => scheduleRetry(record, attempt));
+        }
+
+        function scheduleRetry(record, attempt) {
+            if (attempt >= MAX_SUBMIT_ATTEMPTS) {
+                setSubmissionStatus('Could not reach the server after ' + MAX_SUBMIT_ATTEMPTS + ' attempts.');
+                $('#retrySubmit').removeClass('d-none').off('click').on('click', function() {
+                    $(this).addClass('d-none');
+                    submitRecord(record, 1);
+                });
+                return;
+            }
+            const delay = Math.min(1000 * Math.pow(2, attempt - 1), 30000);
+            setSubmissionStatus('Attempt ' + attempt + ' of ' + MAX_SUBMIT_ATTEMPTS +
+                                ' failed — retrying in ' + Math.round(delay / 1000) + 's…');
+            setTimeout(() => submitRecord(record, attempt + 1), delay);
+        }
+
         $('#confirmSubmit').click(function() {
             // If Gift Aid section is shown, require the confirmation checkbox
             if ($('#giftAidSection').is(':visible') && !$('#giftAidConfirm').is(':checked')) {
@@ -869,55 +942,14 @@
             clearGiftAidWarning();
             confirmationModal.hide();
 
-            const submitButton = form.find('button[type="submit"]');
-            submitButton.prop('disabled', true).text('Processing...');
-
             const formData = new FormData(form[0]);
             formData.append('timestamp', new Date().toISOString());
             formData.append('price', calculateTotalPrice().toFixed(2));
-            formData.append('donation', calculateTotalDonations().toFixed(2)); // Add donations
+            formData.append('donation', calculateTotalDonations().toFixed(2));
+            const lockedRecord = Object.fromEntries(formData.entries());
 
-            const body = {
-                record: Object.fromEntries(formData.entries()),
-                authToken: localStorage.getItem('authToken'),
-                idempotencyKey: currentSubmissionKey
-            };
-
-            fetch(appsScriptUrl, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
-                body: JSON.stringify(body)
-            })
-            .then(async response => {
-                if (!response.ok) {
-                    throw new Error('An error occurred while submitting the form');
-                }
-
-                const res = await response.text();
-                switch (res) {
-                    case 'Success':
-                        fetchTodayTotals({ quiet: true });
-                        successModal.show();
-                        $('form').trigger('reset');
-                        $('#giftAidConfirm').prop('checked', false);
-                        currentSubmissionKey = null;
-                        break;
-                    case 'Unauthorized':
-                        alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
-                        authenticate(true);
-                        break;
-                    default:
-                        throw new Error('Unexpected response from server: ' + res);
-                }
-            })
-            .catch(error => {
-                alert(error);
-            })
-            .finally(() => {
-                submitButton.prop('disabled', false).text('Submit');
-            });
+            lockForm();
+            submitRecord(lockedRecord, 1);
         });
     }
 
