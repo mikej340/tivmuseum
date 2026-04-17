@@ -583,7 +583,7 @@
             return { valid: false, unauthorized: false, error: message };
         }
 
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             async function checkAndSetToken(token, contextMessage) {
                 const verification = await verifyWithRetry(token, contextMessage);
                 if (verification.valid) {
