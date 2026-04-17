@@ -598,9 +598,9 @@
             }
 
             let msg = 'Please enter the secret token:';
-            let prefill = '';
+            let prefill = localStorage.getItem('authToken') || '';
 
-            const existingToken = localStorage.getItem('authToken');
+            const existingToken = prefill;
             if (existingToken) {
                 try {
                     const result = await checkAndSetToken(existingToken, 'Verifying existing token');
@@ -612,15 +612,13 @@
                         msg = 'The existing token is incorrect. Please enter the secret token:';
                     }
                 } catch (error) {
-                    // Connection error — token may still be valid; pre-fill so user can just hit OK to retry
                     msg = 'Could not reach the server (connection error). Your saved token has not been cleared. Please try again:';
-                    prefill = existingToken;
                 }
             }
 
             while (true) {
                 const token = prompt(msg, prefill);
-                prefill = '';
+                prefill = token || '';
                 try {
                     const result = await checkAndSetToken(token, 'Verifying provided token');
                     if (result.valid) {
