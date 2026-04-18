@@ -1,1 +1,5 @@
 node_modules
+
+# clasp / Apps Script auth (generated locally or in CI from secrets — never commit)
+.clasp.json
+.clasprc.json

@@ -1,0 +1,88 @@
+name: Deploy Apps Script
+
+# Pushes appscript.js to the Google Apps Script project and redeploys the
+# existing web app deployment, so the URL hardcoded in index.html stays stable.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   CLASPRC_JSON    Contents of your local ~/.clasprc.json after `clasp login`
+#   SCRIPT_ID       Apps Script project ID (Apps Script editor → Project Settings)
+#   DEPLOYMENT_ID   The deployment to redeploy (Apps Script editor → Deploy → Manage deployments)
+#
+# See DEPLOYMENT.md for one-time setup.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'appscript.js'
+      - 'appsscript.json'
+      - '.github/workflows/deploy-appscript.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-appscript
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp@2.4.2
+
+      - name: Verify appsscript.json exists
+        run: |
+          if [ ! -f appsscript.json ]; then
+            echo "::error::appsscript.json is missing. Run 'clasp pull' locally once and commit the file (see DEPLOYMENT.md)."
+            exit 1
+          fi
+
+      - name: Write clasp auth
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+        run: |
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "::error::CLASPRC_JSON secret is not set. See DEPLOYMENT.md."
+            exit 1
+          fi
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+
+      - name: Write .clasp.json
+        env:
+          SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
+        run: |
+          if [ -z "$SCRIPT_ID" ]; then
+            echo "::error::SCRIPT_ID secret is not set. See DEPLOYMENT.md."
+            exit 1
+          fi
+          cat > .clasp.json <<EOF
+          {
+            "scriptId": "$SCRIPT_ID",
+            "rootDir": "."
+          }
+          EOF
+
+      - name: Push source to Apps Script
+        run: clasp push --force
+
+      - name: Redeploy web app
+        env:
+          DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
+        run: |
+          if [ -z "$DEPLOYMENT_ID" ]; then
+            echo "::error::DEPLOYMENT_ID secret is not set. See DEPLOYMENT.md."
+            exit 1
+          fi
+          clasp deploy \
+            --deploymentId "$DEPLOYMENT_ID" \
+            --description "main@${GITHUB_SHA::7}"
