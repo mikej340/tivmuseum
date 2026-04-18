@@ -1,0 +1,8 @@
+# Only push Apps Script source files to the project.
+# Whitelist approach: ignore everything, then allow back only what should live
+# in the Apps Script project.
+
+**/**
+
+!appscript.js
+!appsscript.json
