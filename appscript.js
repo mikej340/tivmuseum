@@ -53,6 +53,27 @@ function doGet(e) {
       return ContentService.createTextOutput(JSON.stringify(heardData))
         .setMimeType(ContentService.MimeType.TEXT);
     
+    case 'getConfig':
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+      const vtSheet = ss.getSheetByName('Visitor Types');
+      const vtData = vtSheet.getDataRange().getValues();
+      vtData.shift();
+
+      const rfvSheet = ss.getSheetByName('Reason For Visit');
+      const rfvData = rfvSheet.getDataRange().getValues();
+      rfvData.shift();
+
+      const hauSheet = ss.getSheetByName('How Did You Hear About Us');
+      const hauData = hauSheet.getDataRange().getValues();
+      hauData.shift();
+
+      return ContentService.createTextOutput(JSON.stringify({
+        visitorTypes: vtData,
+        reasonsForVisit: rfvData,
+        heardAboutUs: hauData
+      })).setMimeType(ContentService.MimeType.TEXT);
+
     case 'getTodayTotals':
       const todayTotals = getTotalsForDate(new Date());
       return ContentService.createTextOutput(JSON.stringify(todayTotals || {}))

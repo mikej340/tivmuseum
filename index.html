@@ -983,67 +983,42 @@
         initializeLocationPickerInput();
     }
 
-    function initializeVisitorTypes() {
-        return fetchWithRetry(`${appsScriptUrl}?action=getVisitorTypes&authToken=${localStorage.getItem('authToken')}`)
+    function initializeConfig() {
+        return fetchWithRetry(`${appsScriptUrl}?action=getConfig&authToken=${localStorage.getItem('authToken')}`)
             .then(response => response.text())
             .then(text => {
                 const data = JSON.parse(text);
-                visitorTypes = data.map(row => {
-                    
-                    return {
-                        id: row[0],
-                        label: row[1],
-                        shortLabel: row[2],
-                        price: row[3] ? parseFloat(row[3]) : 0,
-                        isAdult: row[4].toLowerCase() === 'yes',
-                        visibleByDefault: row[5].toLowerCase() === 'yes', // Column is "Frequently used" in the sheet
-                        donation: row[6] ? parseFloat(row[6]) : 0
-                    };
-                });
-            });
-    }
 
-    function initializeReasonForVisit() {
-        return fetchWithRetry(`${appsScriptUrl}?action=getReasonsForVisit&authToken=${localStorage.getItem('authToken')}`)
-            .then(response => response.text())
-            .then(text => {
-                const data = JSON.parse(text);
-                const select = $('#reason-for-visit');
-                select.empty();
-                select.append('<option value="" disabled selected></option>');
-                
-                data.forEach(row => {
-                    const option = $('<option>', {
-                        value: row[0],
-                        text: row[0]
-                    });
-                    
-                    // If second column is 'Y', set as default selected
+                // Visitor types
+                visitorTypes = data.visitorTypes.map(row => ({
+                    id: row[0],
+                    label: row[1],
+                    shortLabel: row[2],
+                    price: row[3] ? parseFloat(row[3]) : 0,
+                    isAdult: row[4].toLowerCase() === 'yes',
+                    visibleByDefault: row[5].toLowerCase() === 'yes',
+                    donation: row[6] ? parseFloat(row[6]) : 0
+                }));
+
+                // Reasons for visit
+                const reasonSelect = $('#reason-for-visit');
+                reasonSelect.empty();
+                reasonSelect.append('<option value="" disabled selected></option>');
+                data.reasonsForVisit.forEach(row => {
+                    const option = $('<option>', { value: row[0], text: row[0] });
                     if (row[1] === 'Yes') {
                         option.prop('selected', true);
                         formState.defaultReasonForVisit = row[0];
                     }
-                    
-                    select.append(option);
+                    reasonSelect.append(option);
                 });
-            });
-    }
 
-    function initializeHowHeardAboutUs() {
-        return fetchWithRetry(`${appsScriptUrl}?action=getHeardAboutUs&authToken=${localStorage.getItem('authToken')}`)
-            .then(response => response.text())
-            .then(text => {
-                const data = JSON.parse(text);
-                const select = $('#hear-about-us');
-                select.empty();
-                select.append('<option value="" disabled selected></option>');
-                
-                data.forEach(row => {
-                    const option = $('<option>', {
-                        value: row[0],
-                        text: row[0]
-                    });
-                    select.append(option);
+                // How did you hear about us
+                const heardSelect = $('#hear-about-us');
+                heardSelect.empty();
+                heardSelect.append('<option value="" disabled selected></option>');
+                data.heardAboutUs.forEach(row => {
+                    heardSelect.append($('<option>', { value: row[0], text: row[0] }));
                 });
             });
     }
@@ -1059,11 +1034,7 @@
         authenticate(false, updateLoadingStatus)
             .then(() => {
                 updateLoadingStatus('Loading form options...');
-                return Promise.all([
-                    initializeVisitorTypes(),
-                    initializeReasonForVisit(),
-                    initializeHowHeardAboutUs()
-                ]);
+                return initializeConfig();
             })
             .then(() => {
                 initializeZoomControls();
