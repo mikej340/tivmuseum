@@ -217,7 +217,9 @@
     </style>
 </head>
 <body>
-    <p id="app-version" style="position: fixed; bottom: 0.4rem; right: 0.5rem; font-size: 1rem; color: #aaa; margin: 0; z-index: 999;"></p>
+    <p style="position: fixed; bottom: 0.4rem; right: 0.5rem; font-size: 1rem; color: #aaa; margin: 0; z-index: 999;">
+        <a id="app-version" href="#" style="color: inherit; text-decoration: none;"></a>
+    </p>
     <div id="loadingOverlay">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -1047,7 +1049,14 @@
                 initializeFormStateManagement();
                 updateFormSummaryAndVisibility();
                 fetchTodayTotals();
-                $('#app-version').text('App updated: ' + new Date(document.lastModified).toLocaleString('en-GB'));
+                const versionLink = $('#app-version');
+                versionLink.text('App updated: ' + new Date(document.lastModified).toLocaleString('en-GB'));
+                versionLink.on('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Reload the app to get the latest version?')) {
+                        window.location.href = window.location.pathname + '?v=' + Date.now();
+                    }
+                });
                 
                 // Show form and hide loading overlay
                 $('#loadingOverlay').fadeOut();
