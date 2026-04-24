@@ -217,6 +217,7 @@
     </style>
 </head>
 <body>
+    <p id="app-version" style="position: fixed; bottom: 0.4rem; right: 0.5rem; font-size: 1rem; color: #aaa; margin: 0; z-index: 999;"></p>
     <div id="loadingOverlay">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -1075,6 +1076,7 @@
                 initializeFormStateManagement();
                 updateFormSummaryAndVisibility();
                 fetchTodayTotals();
+                $('#app-version').text('App updated: ' + new Date(document.lastModified).toLocaleString('en-GB'));
                 
                 // Show form and hide loading overlay
                 $('#loadingOverlay').fadeOut();
