@@ -1,0 +1,6 @@
+{
+  "name": "Admissions Register",
+  "short_name": "AdmReg",
+  "start_url": "/",
+  "display": "standalone"
+}
