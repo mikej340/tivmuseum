@@ -653,15 +653,9 @@
         const zoomButtons = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom buttons"></div>');
         const zoomLevels = [1, 1.25, 1.5, 1.75];
         const zoomTarget = $('body');
-        const root = document.documentElement;
-        const baseRootFontSizePx = parseFloat(getComputedStyle(root).fontSize) || 16;
 
         const applyZoom = (level) => {
-            // Preferred where supported: scales the whole UI, including fixed-position controls.
             zoomTarget.css('zoom', level);
-
-            // Cross-browser fallback (notably iOS Safari): scale typography via root font size.
-            root.style.fontSize = `${baseRootFontSizePx * level}px`;
         };
 
         // Ensure base zoom is 1 so 1x = default size
