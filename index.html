@@ -20,11 +20,8 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
-            height: 100vh;
-        }
-        #page-content {
             padding: 0 1em;
+            height: 100vh;
         }
         .zoom-controls {
             position: fixed;
@@ -225,7 +222,6 @@
     </style>
 </head>
 <body>
-<div id="page-content">
     <p style="position: fixed; bottom: 0.4rem; right: 0.5rem; font-size: 1rem; color: #aaa; margin: 0; z-index: 999;">
         <a id="app-version" href="#" style="color: inherit; text-decoration: none;"></a>
     </p>
@@ -347,7 +343,6 @@
             </div>
         </div>
     </div>
-</div><!-- #page-content -->
 </body>
 </html>
 <script>
@@ -659,7 +654,9 @@
         const zoomControls = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom"></div>');
 
         const applyZoom = (level) => {
-            $('#page-content').css('zoom', level);
+            $('body').css('zoom', level);
+            // Counter-scale so the controls render at their original size regardless of body zoom
+            zoomControls.css('zoom', 1 / level);
             zoomControls.find('button').removeClass('active');
             zoomControls.find(`[data-zoom="${level}"]`).addClass('active');
         };
@@ -670,7 +667,6 @@
             zoomControls.append(btn);
         });
 
-        // Prepend to body so controls sit outside #page-content and are never zoomed
         $('body').prepend(zoomControls);
         applyZoom(1);
     }
