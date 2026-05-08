@@ -654,8 +654,8 @@
         const zoomControls = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom"></div>');
 
         const applyZoom = (level) => {
-            $('body').css('zoom', level);
-            // Counter-scale so the controls render at their original size regardless of body zoom
+            $('html').css('zoom', level);
+            // Counter-scale so the controls render at their original size regardless of html zoom
             zoomControls.css('zoom', 1 / level);
             zoomControls.find('button').removeClass('active');
             zoomControls.find(`[data-zoom="${level}"]`).addClass('active');
