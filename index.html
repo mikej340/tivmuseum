@@ -20,8 +20,11 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0 1em;
+            padding: 0;
             height: 100vh;
+        }
+        #page-content {
+            padding: 0 1em;
         }
         .zoom-controls {
             position: fixed;
@@ -222,6 +225,7 @@
     </style>
 </head>
 <body>
+<div id="page-content">
     <p style="position: fixed; bottom: 0.4rem; right: 0.5rem; font-size: 1rem; color: #aaa; margin: 0; z-index: 999;">
         <a id="app-version" href="#" style="color: inherit; text-decoration: none;"></a>
     </p>
@@ -343,6 +347,7 @@
             </div>
         </div>
     </div>
+</div><!-- #page-content -->
 </body>
 </html>
 <script>
@@ -650,28 +655,24 @@
     }
 
     function initializeZoomControls() {
-        const zoomButtons = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom buttons"></div>');
         const zoomLevels = [1, 1.25, 1.5, 1.75];
-        const zoomTarget = $('body');
+        const zoomControls = $('<div class="btn-group zoom-controls" role="group" aria-label="Zoom"></div>');
 
         const applyZoom = (level) => {
-            zoomTarget.css('zoom', level);
+            $('#page-content').css('zoom', level);
+            zoomControls.find('button').removeClass('active');
+            zoomControls.find(`[data-zoom="${level}"]`).addClass('active');
         };
 
-        // Ensure base zoom is 1 so 1x = default size
-        applyZoom(1);
-
         zoomLevels.forEach(level => {
-            const zoomButton = $(`<button type="button" class="btn btn-secondary ${level === 1 ? 'active' : ''}">${level}x</button>`);
-            zoomButton.click(function() {
-                applyZoom(level);
-                zoomButtons.find('button').removeClass('active');
-                $(this).addClass('active');
-            });
-            zoomButtons.append(zoomButton);
+            const btn = $(`<button type="button" class="btn btn-secondary" data-zoom="${level}">${level}x</button>`);
+            btn.on('click', () => applyZoom(level));
+            zoomControls.append(btn);
         });
 
-        $('body').prepend(zoomButtons);
+        // Prepend to body so controls sit outside #page-content and are never zoomed
+        $('body').prepend(zoomControls);
+        applyZoom(1);
     }
 
     function initializeVisitorInputs() {
