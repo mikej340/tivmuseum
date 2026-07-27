@@ -577,7 +577,7 @@
         updateReasonForVisitMode(hotelDiscountCount > 0);
 
         // Toggle visibility and required state of additional fields
-        const isMembersOnly = hotelDiscountCount === 0 && totalAdults > 0 && totalMembers === totalAdults;
+        const isMembersOnly = totalAdults > 0 && totalMembers === totalAdults;
         $('.grid-container.other').toggle(!isMembersOnly);
         $('#members-only-message').toggle(isMembersOnly);
         
