@@ -253,7 +253,7 @@
                 <input type="text" id="postcode" name="postcode" required style="text-transform: uppercase;" class="form-control form-control-lg" readonly inputmode="none" aria-haspopup="dialog">
             </div>
             <div>
-                <label for="reason-for-visit" class="form-label">Reason for Visit</label>
+                <label for="reason-for-visit" class="form-label" id="reason-for-visit-label">Reason for Visit</label>
                 <select id="reason-for-visit" name="reason-for-visit" class="form-control form-control-lg" required>
                 </select>
             </div>
@@ -365,7 +365,12 @@
     const formState = {
         defaultReasonForVisit: '',
         heardAboutUsOther: 'Other - please specify', // Must match spreadsheet ID
-        childTypeId: 'child' // Must match spreadsheet ID
+        childTypeId: 'child', // Must match spreadsheet ID
+        hotelDiscountTypeId: 'hotel-discount', // Must match spreadsheet ID
+        hotelOptions: ['Tiverton Hotel', 'Angel Guesthouse', 'Bridge Guesthouse'],
+        reasonOptions: [],
+        hotelMode: false,
+        reasonBeforeHotelMode: ''
     };
     const todayTotalsDefaults = { totalVisitors: 0, totalPrice: 0, totalDonation: 0 };
     const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -499,11 +504,50 @@
         return totalPrice;
     }
 
+    function renderReasonOptions(options, selectedValue = '') {
+        const reasonSelect = $('#reason-for-visit');
+        reasonSelect.empty();
+        reasonSelect.append('<option value="" disabled></option>');
+
+        options.forEach(option => {
+            const value = typeof option === 'string' ? option : option.value;
+            const isDefault = typeof option === 'object' && option.isDefault;
+            reasonSelect.append($('<option>', {
+                value,
+                text: value,
+                selected: value === selectedValue || (!selectedValue && isDefault)
+            }));
+        });
+    }
+
+    function updateReasonForVisitMode(hasHotelDiscount) {
+        if (hasHotelDiscount === formState.hotelMode) {
+            return;
+        }
+
+        const reasonSelect = $('#reason-for-visit');
+
+        if (hasHotelDiscount) {
+            formState.reasonBeforeHotelMode = reasonSelect.val() || '';
+            $('#reason-for-visit-label').text('Hotel');
+            renderReasonOptions(formState.hotelOptions);
+        } else {
+            $('#reason-for-visit-label').text('Reason for Visit');
+            renderReasonOptions(
+                formState.reasonOptions,
+                formState.reasonBeforeHotelMode || formState.defaultReasonForVisit
+            );
+        }
+
+        formState.hotelMode = hasHotelDiscount;
+    }
+
     function updateFormSummaryAndVisibility() {
         let totalAdults = 0;
         let totalChildren = 0;
         let totalVisitors = 0;
         const totalMembers = parseInt($('#members').val()) || 0;
+        const hotelDiscountCount = parseInt($(`#${formState.hotelDiscountTypeId}`).val()) || 0;
 
         visitorTypes.forEach(type => {
             const count = parseInt($(`#${type.id}`).val()) || 0;
@@ -529,6 +573,8 @@
             summaryText += ` - £${calculateTotalPrice().toFixed(2)}`;
         }
         $('#summary-message').text(summaryText || 'No visitors selected');
+
+        updateReasonForVisitMode(hotelDiscountCount > 0);
 
         // Toggle visibility and required state of additional fields
         const isMembersOnly = totalAdults > 0 && totalMembers === totalAdults;
@@ -794,6 +840,11 @@
                 event.preventDefault();
             }
         });
+
+        $('form').on('reset', function() {
+            // Wait until the browser has restored the form controls to their defaults.
+            setTimeout(updateFormSummaryAndVisibility, 0);
+        });
     }
 
     function calculateTotalDonations() {
@@ -831,6 +882,12 @@
                 row.append(`<td style="text-align: right;">£${detail.subtotal.toFixed(2)}</td>`);
                 tableBody.append(row);
             });
+
+            if (formState.hotelMode) {
+                const hotelRow = $('<tr></tr>');
+                hotelRow.append($('<td colspan="3"></td>').text(`Hotel: ${$('#reason-for-visit').val()}`));
+                tableBody.append(hotelRow);
+            }
 
             // Add total row
             const totalRow = $('<tr class="total"></tr>');
@@ -1003,17 +1060,13 @@
         }));
 
         // Reasons for visit
-        const reasonSelect = $('#reason-for-visit');
-        reasonSelect.empty();
-        reasonSelect.append('<option value="" disabled selected></option>');
-        data.reasonsForVisit.forEach(row => {
-            const option = $('<option>', { value: row[0], text: row[0] });
-            if (row[1] === 'Yes') {
-                option.prop('selected', true);
-                formState.defaultReasonForVisit = row[0];
-            }
-            reasonSelect.append(option);
-        });
+        formState.reasonOptions = data.reasonsForVisit.map(row => ({
+            value: row[0],
+            isDefault: row[1] === 'Yes'
+        }));
+        const defaultReason = formState.reasonOptions.find(option => option.isDefault);
+        formState.defaultReasonForVisit = defaultReason ? defaultReason.value : '';
+        renderReasonOptions(formState.reasonOptions, formState.defaultReasonForVisit);
 
         // How did you hear about us
         const heardSelect = $('#hear-about-us');
