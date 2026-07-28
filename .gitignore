@@ -3,3 +3,10 @@ node_modules
 # clasp / Apps Script auth (generated locally or in CI from secrets — never commit)
 .clasp.json
 .clasprc.json
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
