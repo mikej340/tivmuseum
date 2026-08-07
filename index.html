@@ -805,11 +805,10 @@
                 $('input, textarea, select').each(updateFieldFilledState);
                 updateFormDependencies();
                 updateFormSummaryAndVisibility();
-                
-                // Restore defaults
-                if (formState.defaultReasonForVisit) {
-                    $('#reason-for-visit').val(formState.defaultReasonForVisit);
-                }
+
+                // Start each new visit without carrying over a previous reason.
+                formState.reasonBeforeHotelMode = '';
+                $('#reason-for-visit').val('');
             }, 0);
         });
 
