@@ -524,6 +524,8 @@
                 selected: value === effectiveSelectedValue
             }));
         });
+
+        reasonSelect.trigger('change');
     }
 
     function updateReasonForVisitMode(hasHotelDiscount) {
@@ -588,7 +590,7 @@
         $('#members-only-message').toggle(isMembersOnly);
         
         // Update required attributes
-        $('#postcode, #first-visit, #hear-about-us').prop('required', !isMembersOnly);
+        $('#postcode, #reason-for-visit, #first-visit, #hear-about-us').prop('required', !isMembersOnly);
     }
 
     async function verifyToken(token) {
@@ -808,13 +810,16 @@
         // Handle form reset
         $('form').on('reset', function() {
             setTimeout(function() {
-                $('input, textarea, select').each(updateFieldFilledState);
+                // Restore the normal reason selector without carrying hotel state
+                // into the next visit.
+                formState.reasonBeforeHotelMode = '';
+                formState.hotelMode = false;
+                $('#reason-for-visit-label').text('Reason for Visit');
+                renderReasonOptions(formState.reasonOptions, formState.defaultReasonForVisit);
+
                 updateFormDependencies();
                 updateFormSummaryAndVisibility();
-
-                // Start each new visit without carrying over a previous reason.
-                formState.reasonBeforeHotelMode = '';
-                $('#reason-for-visit').val(formState.defaultReasonForVisit || '');
+                $('input, textarea, select').each(updateFieldFilledState);
             }, 0);
         });
 
@@ -846,10 +851,6 @@
             }
         });
 
-        $('form').on('reset', function() {
-            // Wait until the browser has restored the form controls to their defaults.
-            setTimeout(updateFormSummaryAndVisibility, 0);
-        });
     }
 
     function calculateTotalDonations() {
