@@ -778,8 +778,9 @@
     
     function initializeFormStateManagement() {
         function updateFieldFilledState() {
-            if ($(this).is('input[type="checkbox"]')) {
-                return; // Skip checkboxes
+            if ($(this).is('input[type="checkbox"], #reason-for-visit')) {
+                $(this).removeClass('filled');
+                return; // Skip checkboxes and the reason/hotel selector
             }
             if ($(this).is('input[type="number"]') && $(this).val() > 0 || !$(this).is('input[type="number"]') && $(this).val()) {
                 $(this).addClass('filled');
