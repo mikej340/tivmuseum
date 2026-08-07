@@ -506,16 +506,22 @@
 
     function renderReasonOptions(options, selectedValue = '') {
         const reasonSelect = $('#reason-for-visit');
+        const defaultOption = options.find(option => typeof option === 'object' && option.isDefault);
+        const effectiveSelectedValue = selectedValue || (defaultOption ? defaultOption.value : '');
+
         reasonSelect.empty();
-        reasonSelect.append('<option value="" disabled></option>');
+        reasonSelect.append($('<option>', {
+            value: '',
+            disabled: true,
+            selected: !effectiveSelectedValue
+        }));
 
         options.forEach(option => {
             const value = typeof option === 'string' ? option : option.value;
-            const isDefault = typeof option === 'object' && option.isDefault;
             reasonSelect.append($('<option>', {
                 value,
                 text: value,
-                selected: value === selectedValue || (!selectedValue && isDefault)
+                selected: value === effectiveSelectedValue
             }));
         });
     }
@@ -808,7 +814,7 @@
 
                 // Start each new visit without carrying over a previous reason.
                 formState.reasonBeforeHotelMode = '';
-                $('#reason-for-visit').val('');
+                $('#reason-for-visit').val(formState.defaultReasonForVisit || '');
             }, 0);
         });
 
