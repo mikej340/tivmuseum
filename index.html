@@ -273,7 +273,6 @@
             </div>
         </div>
         <div class="form-footer">
-            <p id="members-only-message" style="display: none;">(No other fields required as only members visiting)</p>
             <p id="summary-message" class="text-muted mb-3"></p>
             <button type="submit" class="btn btn-lg btn-primary">Submit</button>
             <button type="reset" class="btn btn-lg btn-secondary">Reset</button>
@@ -553,8 +552,6 @@
     function updateFormSummaryAndVisibility() {
         let totalAdults = 0;
         let totalChildren = 0;
-        let totalVisitors = 0;
-        const totalMembers = parseInt($('#members').val()) || 0;
         const hotelDiscountCount = parseInt($(`#${formState.hotelDiscountTypeId}`).val()) || 0;
 
         visitorTypes.forEach(type => {
@@ -564,7 +561,6 @@
             } else if (type.id === formState.childTypeId) {
                 totalChildren += count;
             }
-            totalVisitors += count;
         });
 
         // Update summary message
@@ -583,14 +579,6 @@
         $('#summary-message').text(summaryText || 'No visitors selected');
 
         updateReasonForVisitMode(hotelDiscountCount > 0);
-
-        // Toggle visibility and required state of additional fields
-        const isMembersOnly = totalAdults > 0 && totalMembers === totalAdults;
-        $('.grid-container.other').toggle(!isMembersOnly);
-        $('#members-only-message').toggle(isMembersOnly);
-        
-        // Update required attributes
-        $('#postcode, #reason-for-visit, #first-visit, #hear-about-us').prop('required', !isMembersOnly);
     }
 
     async function verifyToken(token) {
@@ -866,9 +854,35 @@
         const confirmationModal = new bootstrap.Modal($('#confirmationModal')[0]);
         const successModal = new bootstrap.Modal($('#successModal')[0]);
         const form = $('form');
+        let submitting = false;
+        let pendingSubmission = null;
+        function createSubmissionId() {
+            if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+            // getRandomValues also works on plain HTTP LAN preview URLs.
+            const bytes = crypto.getRandomValues(new Uint8Array(16));
+            bytes[6] = (bytes[6] & 0x0f) | 0x40;
+            bytes[8] = (bytes[8] & 0x3f) | 0x80;
+            const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+            return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+        }
+        const pendingKey = 'pendingAdmissionSubmission';
+        try {
+            pendingSubmission = JSON.parse(sessionStorage.getItem(pendingKey));
+        } catch (error) {
+            console.warn('Could not restore pending submission', error);
+        }
+        form.on('reset', function(event) {
+            if (submitting) {
+                event.preventDefault();
+                return;
+            }
+            pendingSubmission = null;
+            try { sessionStorage.removeItem(pendingKey); } catch (error) { console.warn(error); }
+        });
 
         form.submit(function(event) {
             event.preventDefault();
+            if (submitting) return;
 
             const ticketDetails = visitorTypes.map(type => {
                 const count = parseInt($(`#${type.id}`).val()) || 0;
@@ -927,27 +941,49 @@
         giftAidCheckbox.change(clearGiftAidWarning);
 
         $('#confirmSubmit').click(function() {
+            if (submitting) return;
+            // Update the summary and recheck validity at final confirmation.
+            updateFormSummaryAndVisibility();
+            if (!form[0].checkValidity()) {
+                confirmationModal.hide();
+                alert('Please complete the required admission fields before submitting.');
+                return;
+            }
             // If Gift Aid section is shown, require the confirmation checkbox
             if ($('#giftAidSection').is(':visible') && !$('#giftAidConfirm').is(':checked')) {
                 showGiftAidWarning();
                 return;
             }
 
-            clearGiftAidWarning();
-            confirmationModal.hide();
-
-            const submitButton = form.find('button[type="submit"]');
-            submitButton.prop('disabled', true).text('Processing...');
-
             const formData = new FormData(form[0]);
-            formData.append('timestamp', new Date().toISOString());
             formData.append('price', calculateTotalPrice().toFixed(2));
             formData.append('donation', calculateTotalDonations().toFixed(2)); // Add donations
-
+            const record = Object.fromEntries(formData.entries());
+            const signature = JSON.stringify(record);
+            // Retain the identity and timestamp if the saved response was lost.
+            if (!pendingSubmission || pendingSubmission.signature !== signature) {
+                pendingSubmission = {
+                    signature,
+                    requestId: createSubmissionId(),
+                    timestamp: new Date().toISOString()
+                };
+            }
+            try { sessionStorage.setItem(pendingKey, JSON.stringify(pendingSubmission)); } catch (error) { console.warn(error); }
             const body = { 
-                record: Object.fromEntries(formData.entries()), 
+                record: { ...record, timestamp: pendingSubmission.timestamp },
+                requestId: pendingSubmission.requestId,
                 authToken: localStorage.getItem('authToken')
             };
+            let saved = false;
+
+            submitting = true;
+            clearGiftAidWarning();
+            confirmationModal.hide();
+            const submitButton = form.find('button[type="submit"]');
+            submitButton.prop('disabled', true).text('Processing...');
+            $('#confirmSubmit').prop('disabled', true);
+            const enabledFields = form.find('input, textarea, select, button').filter(':enabled');
+            enabledFields.prop('disabled', true);
 
             fetch(appsScriptUrl, {
                 method: 'POST',
@@ -964,10 +1000,14 @@
                 const res = await response.text();
                 switch (res) {
                     case 'Success':
-                        fetchTodayTotals({ quiet: true });
-                        successModal.show();
-                        $('form').trigger('reset');
+                        saved = true;
+                        // Clear the saved visit before optional UI updates can fail.
+                        submitting = false;
+                        enabledFields.prop('disabled', false);
+                        form[0].reset();
                         $('#giftAidConfirm').prop('checked', false);
+                        successModal.show();
+                        fetchTodayTotals({ quiet: true });
                         break;
                     case 'Unauthorized':
                         alert('Unauthorized access. The secret token is incorrect. Please enter correct token and then try again.');
@@ -978,10 +1018,16 @@
                 }
             })
             .catch(error => {
-                alert(error);
+                console.error('Admission submission failed', error);
+                alert(saved
+                    ? 'The admission was saved, but the display could not update. Please reload the page before entering the next admission.'
+                    : 'Could not confirm whether the admission was saved. Keep the form unchanged and submit again to safely retry the same admission. ' + error.message);
             })
             .finally(() => {
+                submitting = false;
+                enabledFields.prop('disabled', false);
                 submitButton.prop('disabled', false).text('Submit');
+                $('#confirmSubmit').prop('disabled', false);
             });
         });
     }
