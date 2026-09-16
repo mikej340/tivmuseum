@@ -78,3 +78,29 @@ the `DEPLOYMENT_ID` secret, then push.
 - **`Invalid credentials`** — your `CLASPRC_JSON` secret has expired. Run
   `clasp login` again locally and re-paste the new contents.
 - **Workflow says `appsscript.json is missing`** — see step 2 above.
+
+## Duplicate submission protection
+
+For a table that automatically fills computed columns, add `submission-id`
+immediately before the first `# …` column (normally `# Date`) before testing.
+The writer omits trailing computed columns so their formula cells are not
+explicitly written as blanks. Historical rows can keep blank submission IDs.
+
+Deploy the updated `appscript.js` backend before releasing the updated form.
+If `submission-id` is missing, the first submission adds it at the end of
+`Visitors` as a fallback. For tables with computed columns, create it before
+those columns as described above. No existing rows are changed. Keep this
+column: it lets the server recognize retries even after a script restart.
+Older forms still work, but do not send an ID and therefore cannot benefit
+from retry protection; reload the admissions devices after release.
+
+The form keeps the pending ID and original timestamp in session storage.
+An unchanged retry in the same browser tab reuses them, including after a
+reload. A reset or changed record starts a new admission. If a response is
+lost, retry with the form unchanged before resetting or entering a new visit.
+
+Run the submission regression checks with:
+
+```bash
+node --test tests/submission.test.cjs
+```

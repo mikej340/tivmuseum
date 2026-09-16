@@ -93,8 +93,34 @@ function doPost(e) {
     return ContentService.createTextOutput('Unauthorized').setMimeType(ContentService.MimeType.TEXT);
   }
 
+  if (data.requestId !== undefined && !/^[a-f0-9-]{36}$/i.test(data.requestId)) {
+    return ContentService.createTextOutput('Invalid submission ID').setMimeType(ContentService.MimeType.TEXT);
+  }
+
+  // Serialize the duplicate check and append, including simultaneous retries.
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    return appendAdmission(data);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function appendAdmission(data) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Visitors'); // Change sheet name as needed
   const headings = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  // The ID belongs to the request, not the visitor survey record. Keep it in
+  // the same row so a saved request remains identifiable after a response loss.
+  const idHeading = 'submission-id';
+  const idIndex = headings.indexOf(idHeading);
+  if (data.requestId && idIndex !== -1 && sheet.getLastRow() > 1) {
+    const ids = sheet.getRange(2, idIndex + 1, sheet.getLastRow() - 1, 1).getValues();
+    if (ids.some(row => row[0] === data.requestId)) {
+      return ContentService.createTextOutput('Success').setMimeType(ContentService.MimeType.TEXT);
+    }
+  }
 
   // Loop through headings and if included in record, then add to records to append to the sheet
   const recordToAppend = {};
@@ -114,12 +140,28 @@ function doPost(e) {
 
   // ensure no entries in data.record are missing from the sheet
   for (const key in data.record) {
-    if (!headings.includes(key)) {
+    if (!headings.includes(key) || key === idHeading) {
       return ContentService.createTextOutput(`"${key}" not found in sheet headings.`).setMimeType(ContentService.MimeType.TEXT);
     }
   }
 
-  sheet.appendRow(Object.values(recordToAppend));
+  const rowToAppend = headings.map(heading => recordToAppend[heading] ?? '');
+  if (data.requestId) {
+    if (idIndex === -1) {
+      sheet.getRange(1, headings.length + 1).setValue(idHeading);
+      rowToAppend.push(data.requestId);
+    } else {
+      rowToAppend[idIndex] = data.requestId;
+    }
+  }
+  // Leave trailing computed columns out of the write. Explicit blanks in
+  // those cells can suppress the table's automatic formula filling.
+  while (rowToAppend.length > 0 && rowToAppend.length <= headings.length &&
+         headings[rowToAppend.length - 1].startsWith('#')) {
+    rowToAppend.pop();
+  }
+  sheet.appendRow(rowToAppend);
+  SpreadsheetApp.flush();
 
   return ContentService.createTextOutput('Success').setMimeType(ContentService.MimeType.TEXT);
 }
